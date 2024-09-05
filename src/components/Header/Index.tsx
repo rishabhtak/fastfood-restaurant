@@ -3,12 +3,16 @@ import { useState } from "react";
 import Link from "next/link";
 import Menu from "./Menu";
 import MobileMenu from "./MobileMenu";
+import { usePathname } from "next/navigation";
 
 const Header = () => {
   const [mobileNavbarOpen, setMobileNavbarOpen] = useState<boolean>(false);
+  const pathname = usePathname();
 
   return (
-    <nav className="w-full h-[80px] bg-[url('/hero-bg.jpg')] flex items-center justify-around z-20 fixed top-0">
+    <nav
+      className={`absolute w-full h-[70px] flex items-center justify-around z-20 top-0 ${pathname === "/" ? "" : "bg-[url('/hero-bg.jpg')] bg-right-top bg-cover"}`}
+    >
       {/* Logo */}
       <Link href="/" className="text-white text-3xl mx-5">
         Logo

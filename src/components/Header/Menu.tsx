@@ -17,7 +17,7 @@ const Menu = () => {
       {navData.map((item: NavData, idx: number) => (
         <li
           key={idx}
-          className="text-white text-lg uppercase cursor-pointer transition ease-in-out hover:text-[#d69e2e] duration-300"
+          className="text-white uppercase cursor-pointer transition ease-in-out hover:text-[#d69e2e] duration-300"
         >
           <Link href={item.url}>{item.name}</Link>
         </li>

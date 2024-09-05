@@ -24,7 +24,7 @@ const MobileMenu = ({
 }: MobileNavbarProps) => {
   return (
     <nav
-      className={`fixed flex lg:hidden top-20 left-0 w-full p-10 z-10 h-screen bg-gray-900 text-white bg-opacity-100 transform delay-100 transition-all duration-300 ${
+      className={`fixed flex lg:hidden top-0 left-0 w-full p-10 z-10 h-screen bg-gray-900 text-white bg-opacity-100 transform delay-100 transition-all duration-300 ${
         mobileNavbarOpen
           ? "opacity-100 translate-x-0"
           : "opacity-0 -translate-x-full"
@@ -40,7 +40,6 @@ const MobileMenu = ({
               href={item.url}
               className="h-full w-full text-lg text-white text-center uppercase transition ease-in-out hover:text-[#d69e2e]"
               onClick={(e: React.MouseEvent<HTMLAnchorElement>) => {
-                e.preventDefault();
                 setMobileNavbarOpen(false);
               }}
             >
