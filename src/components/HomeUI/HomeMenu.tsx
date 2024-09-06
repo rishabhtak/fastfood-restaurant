@@ -17,7 +17,7 @@ const HomeMenu = () => {
             className="w-full h-auto object-cover rounded-2xl"
           />
           <div className="flex flex-col space-y-2 py-5">
-            <h3 className="text-xl font-bold"> Delicious Pizza</h3>
+            <p className="text-xl font-bold"> Delicious Pizza</p>
             <p className="text-sm">
               Veniam debitis quaerat officiis quasi cupiditate quo, quisquam
               velit, magnam voluptatem repellendus sed eaque
@@ -34,7 +34,7 @@ const HomeMenu = () => {
             className="w-full h-auto object-cover rounded-2xl"
           />
           <div className="flex flex-col space-y-2 py-5">
-            <h3 className="text-xl font-bold"> Delicious Burger</h3>
+            <p className="text-xl font-bold"> Delicious Burger</p>
             <p className="text-sm">
               Veniam debitis quaerat officiis quasi cupiditate quo, quisquam
               velit, magnam voluptatem repellendus sed eaque
@@ -51,7 +51,7 @@ const HomeMenu = () => {
             className="w-full h-auto object-cover rounded-2xl"
           />
           <div className="flex flex-col space-y-2 py-5">
-            <h3 className="text-xl font-bold"> Delicious Pasta</h3>
+            <p className="text-xl font-bold"> Delicious Pasta</p>
             <p className="text-sm">
               Veniam debitis quaerat officiis quasi cupiditate quo, quisquam
               velit, magnam voluptatem repellendus sed eaque
@@ -68,7 +68,7 @@ const HomeMenu = () => {
             className="w-full h-auto object-cover rounded-2xl"
           />
           <div className="flex flex-col space-y-2 py-5">
-            <h3 className="text-xl font-bold"> Delicious French Fries</h3>
+            <p className="text-xl font-bold"> Delicious French Fries</p>
             <p className="text-sm">
               Veniam debitis quaerat officiis quasi cupiditate quo, quisquam
               velit, magnam voluptatem repellendus sed eaque
