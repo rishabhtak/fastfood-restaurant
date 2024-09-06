@@ -11,7 +11,9 @@ const Header = () => {
 
   return (
     <nav
-      className={`absolute w-full h-[70px] flex items-center justify-around z-20 top-0 ${pathname === "/" ? "" : "bg-[url('/hero-bg.jpg')] bg-right-top bg-cover"}`}
+      className={`absolute w-full h-[70px] flex items-center justify-around z-20 top-0 ${
+        pathname === "/" ? "" : "bg-[url('/hero-bg.jpg')] bg-right-top bg-cover"
+      }`}
     >
       {/* Logo */}
       <Link href="/" className="text-white text-3xl mx-5">
@@ -64,7 +66,7 @@ const Header = () => {
         </Link>
         <Link
           href="/"
-          className="hidden lg:block bg-[#ffbe33] py-2 px-8 text-white rounded-full transition ease-in-out duration-300 hover:bg-[#d69e2e]"
+          className="hidden lg:block bg-[#ffbe33] py-2 px-8 text-white rounded-full transition ease-in-out duration-300 hover:bg-[#d69e2e] hover:scale-105"
         >
           Order Online
         </Link>
