@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Inter, Dancing_Script } from "next/font/google";
 import "./globals.css";
+import 'react-multi-carousel/lib/styles.css';
 import Header from "@/components/Header/Index";
 
 const inter = Inter({ subsets: ["latin"] });
