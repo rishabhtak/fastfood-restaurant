@@ -26,3 +26,15 @@
   bottom: 0;
   margin: auto;
 }
+
+.scroll-to-top {
+  border-radius: 50% !important;
+  padding: 0.7rem !important;
+  width: 45px !important;
+  height: 45px !important;
+  background-color: #e7272d !important;
+  box-shadow: none !important;
+  z-index: 9999 !important;
+  right:15px!important;
+  bottom:70px!important;
+}

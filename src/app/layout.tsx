@@ -4,6 +4,7 @@ import "./globals.css";
 import "react-multi-carousel/lib/styles.css";
 import Header from "@/components/Header/Index";
 import Footer from "@/components/Footer";
+import ScrollUp from "@/components/ScrollUp";
 
 const inter = Inter({ subsets: ["latin"] });
 const dancingScript = Dancing_Script({
@@ -25,6 +26,7 @@ export default function RootLayout({
     <html lang="en" className={`${dancingScript.variable}`}>
       <body className={inter.className}>
         <Header />
+        <ScrollUp />
         {children}
         <Footer />
       </body>

@@ -69,7 +69,7 @@ const Footer = () => {
           </div>
         </div>
         <div>
-          <ul className="flex justify-end gap-5">
+          <ul className="flex md:justify-end gap-2 md:gap-5">
             <li className="bg-[#3b5998] p-3 rounded-full">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
