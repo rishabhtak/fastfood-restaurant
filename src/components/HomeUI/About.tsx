@@ -5,9 +5,9 @@ const About = () => {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 py-16">
       <div className="flex flex-col justify-center text-center">
-        <h3 className="text-3xl font-bold font-dancingScript text-[#d61c22]">
+        <h1 className="text-3xl font-bold font-dancingScript text-[#d61c22]">
           Fast Food Restaurant
-        </h3>
+        </h1>
         <p className="text-5xl font-bold tracking-widest mt-3">WELCOME</p>
         <p className="font-normal text-sm text-[#666666] mx-10 mt-10">
           Donec quis lorem nulla. Nunc eu odio mi. Morbi nec lobortis est. Sed

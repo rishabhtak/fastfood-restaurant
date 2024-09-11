@@ -3,6 +3,7 @@ import HomeMenu from "@/components/HomeUI/HomeMenu";
 import About from "@/components/HomeUI/About";
 import OrderStep from "@/components/HomeUI/OrderStep";
 import Reviews from "@/components/HomeUI/Reviews";
+import Offers from "@/components/HomeUI/Offers";
 
 export default function Home() {
   return (
@@ -10,9 +11,9 @@ export default function Home() {
       <HeroSection />
       <About />
       <HomeMenu />
+      <Offers />
       <OrderStep />
       <Reviews />
-      <div className="h-[1280px]"></div>
     </>
   );
 }

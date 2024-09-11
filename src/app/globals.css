@@ -3,7 +3,26 @@
 @tailwind utilities;
 
 @layer base {
-    html {
-        @apply bg-[#f4f3e7];
-    }
+  html {
+    @apply bg-[#f4f3e7];
+  }
+}
+
+.footer-logo-area:before {
+  left: 0;
+}
+
+.footer-logo-area:after {
+  right: 0;
+}
+.footer-logo-area:before,
+.footer-logo-area:after {
+  position: absolute;
+  top: 0;
+  width: 40%;
+  height: 1px;
+  background: #e5bcbc;
+  content: "";
+  bottom: 0;
+  margin: auto;
 }

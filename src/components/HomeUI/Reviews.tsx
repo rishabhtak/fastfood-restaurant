@@ -103,9 +103,9 @@ const Reviews = () => {
               />
             </svg>
           </div>
-          <p className="text-sm font-normal uppercase text-center mt-8">
-            Marie Simmons ˗ New York
-          </p>
+          <h4 className="text-sm font-normal uppercase text-center mt-8">
+            Marie Simmons &ndash; New York
+          </h4>
         </div>
         <div className="flex flex-col items-center pb-16">
           <div className="rounded-full overflow-hidden border-4 border-solid border-[#ec1d25] size-28 mx-auto">
@@ -185,9 +185,9 @@ const Reviews = () => {
               />
             </svg>
           </div>
-          <p className="text-sm font-normal uppercase text-center mt-8">
-            Marie Simmons ˗ New York
-          </p>
+          <h4 className="text-sm font-normal uppercase text-center mt-8">
+            Marie Simmons &ndash; New York
+          </h4>
         </div>
       </Carousel>
     </>

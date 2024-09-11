@@ -16,8 +16,8 @@ const Header = () => {
       }`}
     >
       {/* Logo */}
-      <Link href="/" className="text-white text-3xl mx-5">
-        Logo
+      <Link href="/" className="text-white text-3xl mx-5 font-dancingScript">
+        Fast Food
       </Link>
       <Menu />
       <MobileMenu
