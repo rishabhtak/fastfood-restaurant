@@ -1,10 +1,42 @@
 "use client";
 import Image from "next/image";
 import Link from "next/link";
+import { useInView, animated } from "@react-spring/web";
+import { useEffect, useState } from "react";
 const About = () => {
+  const [isMounted, setIsMounted] = useState<boolean>(false);
+  const [ref, leftSpring] = useInView(
+    () => ({
+      from: { transform: "translateX(-100px)", opacity: 0 },
+      to: { transform: "translateX(0px)", opacity: 1 },
+      config: { tension: 100, friction: 22 },
+    }),
+    {
+      once: true,
+      threshold: 0.5,
+    }
+  );
+
+  const [ref2, rightSpring] = useInView(
+    () => ({
+      from: { transform: "translateX(100px)", opacity: 0 },
+      to: { transform: "translateX(0px)", opacity: 1 },
+      config: { tension: 100, friction: 22 },
+    }),
+    { once: true, threshold: 0.6 }
+  );
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 py-16">
-      <div className="flex flex-col justify-center text-center">
+      <animated.div
+        style={leftSpring}
+        ref={ref}
+        className="flex flex-col justify-center text-center"
+      >
         <h1 className="text-3xl font-bold font-dancingScript text-[#d61c22]">
           Fast Food Restaurant
         </h1>
@@ -34,8 +66,12 @@ const About = () => {
             />
           </svg>
         </Link>
-      </div>
-      <div className="block overflow-hidden rounded-xl mx-auto">
+      </animated.div>
+      <animated.div
+        style={rightSpring}
+        ref={ref2}
+        className="block overflow-hidden rounded-xl mx-auto"
+      >
         <Image
           src={"/our-story.webp"}
           alt="about image"
@@ -43,7 +79,7 @@ const About = () => {
           height={390}
           className="object-cover align-middle transition ease-in-out hover:scale-105 duration-300"
         />
-      </div>
+      </animated.div>
     </div>
   );
 };
