@@ -1,12 +1,9 @@
-import MenuUI from "@/components/MenuUI";
-
 const page = () => {
   return (
     <>
       <div className="text-5xl py-24 text-center mt-16 font-bold font-dancingScript">
-        OUR MENU
+        ABOUT US
       </div>
-      <MenuUI />
     </>
   );
 };

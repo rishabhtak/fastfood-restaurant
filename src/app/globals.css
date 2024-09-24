@@ -35,6 +35,20 @@
   background-color: #e7272d !important;
   box-shadow: none !important;
   z-index: 9999 !important;
-  right:15px!important;
-  bottom:70px!important;
+  right: 15px !important;
+  bottom: 70px !important;
+}
+
+.info:before {
+  position: absolute;
+  content: "";
+  left: 0px;
+  top: 16px;
+  width: 100%;
+  border: 1px dashed #e5e5e5;
+}
+.clearfix::after {
+  display: block;
+  clear: both;
+  content: "";
 }

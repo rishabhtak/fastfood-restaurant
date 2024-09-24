@@ -38,7 +38,6 @@ const HeroSection = () => {
       <div className="absolute inset-0 grid content-center ml-4 md:ml-8 lg:ml-28">
         <div className="grid grid-cols-1 md:grid-cols-2">
           <div className="text-white">
-            {/* Animated h1 */}
             <animated.h1
               style={h1Springs}
               className="text-5xl md:text-6xl font-bold mb-4 font-dancingScript"
@@ -46,7 +45,6 @@ const HeroSection = () => {
               Fast Food Restaurant
             </animated.h1>
 
-            {/* Animated paragraph */}
             <animated.p
               style={pSprings}
               className="mb-10 text-sm lg:text-base mx-1"
@@ -57,7 +55,6 @@ const HeroSection = () => {
               quos nihil ducimus libero ipsam.
             </animated.p>
 
-            {/* Animated Link */}
             <animated.div style={linkSprings}>
               <Link
                 href="/"
