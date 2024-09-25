@@ -1,4 +1,4 @@
-import MenuUI from "@/components/MenuUI";
+import MenuUI from "@/components/Client/MenuUI";
 
 const page = () => {
   return (

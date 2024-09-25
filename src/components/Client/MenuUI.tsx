@@ -1,6 +1,6 @@
 "use client";
 import Image from "next/image";
-import SectionTitle from "./SectionTitle";
+import SectionTitle from "@/components/Client/SectionTitle";
 import Offers from "./HomeUI/Offers";
 import Link from "next/link";
 import { useInView, useSpring, animated } from "@react-spring/web";
