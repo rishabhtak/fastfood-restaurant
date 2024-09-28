@@ -4,6 +4,7 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "@/app/globals.css";
 import ContextProvider from "@/components/ContextProvider";
+import NextTopLoader from "nextjs-toploader";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -21,6 +22,7 @@ export default function DashboardLayout({
     <html lang="en" className="bg-[#fefcfb]">
       <body className={inter.className}>
         <ContextProvider>
+          <NextTopLoader showSpinner={false} />
           <div className="flex">
             <Sidebar />
             <main className="w-full flex-1 overflow-hidden">

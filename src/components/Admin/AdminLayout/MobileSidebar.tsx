@@ -1,6 +1,13 @@
 "use client";
 import DashboardNav from "../DashboardNav";
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import {
+  Sheet,
+  SheetContent,
+  SheetTrigger,
+  SheetTitle,
+  SheetDescription,
+} from "@/components/ui/sheet";
+import * as VisuallyHidden from "@radix-ui/react-visually-hidden";
 import { navItems } from "@/constants/data";
 import { MenuIcon } from "lucide-react";
 import { useState } from "react";
@@ -14,6 +21,8 @@ const MobileSidebar = () => {
           <MenuIcon />
         </SheetTrigger>
         <SheetContent side="left" className="!px-0">
+          <SheetTitle />
+          <SheetDescription />
           <div className="space-y-4 py-4">
             <div className="px-3 py-2">
               <h2 className="mb-2 px-4 text-lg font-semibold tracking-tight">
