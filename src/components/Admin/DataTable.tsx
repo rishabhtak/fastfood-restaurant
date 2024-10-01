@@ -16,6 +16,7 @@ import { cn } from "@/lib/utils";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Separator } from "@/components/ui/separator";
 import {
   Select,
   SelectContent,
@@ -58,7 +59,9 @@ import {
   CommandInput,
   CommandItem,
   CommandList,
+  CommandSeparator,
 } from "@/components/ui/command";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   Popover,
   PopoverContent,
@@ -133,9 +136,11 @@ export function DataTable<TData, TValue>({
   pageSizeOptions = [10, 20, 30, 40, 50],
 }: DataTableProps<TData, TValue>) {
   const [open, setOpen] = React.useState(false);
-  const [selectedStatus, setSelectedStatus] = React.useState<Status | null>(
-    null
-  );
+  const [columnVisibility, setColumnVisibility] =
+    React.useState<VisibilityState>({});
+
+  const [sorting, setSorting] = React.useState<SortingState>([]);
+  const [selectedStatuses, setSelectedStatuses] = React.useState<Status[]>([]);
   // console.log('employee', data);
   const router = useRouter();
   const pathname = usePathname();
@@ -190,11 +195,6 @@ export function DataTable<TData, TValue>({
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pageIndex, pageSize]);
-
-  const [columnVisibility, setColumnVisibility] =
-    React.useState<VisibilityState>({});
-
-  const [sorting, setSorting] = React.useState<SortingState>([]);
 
   const table = useReactTable({
     data,
@@ -276,27 +276,53 @@ export function DataTable<TData, TValue>({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchValue]);
 
+  // Toggle selection of a status
+  const handleSelect = (status: Status) => {
+    setSelectedStatuses((prev) =>
+      prev.find((s) => s.value === status.value)
+        ? prev.filter((s) => s.value !== status.value)
+        : [...prev, status]
+    );
+  };
+
+  // Clear all selected statuses
+  const clearFilter = () => setSelectedStatuses([]);
+
   return (
     <>
-      <div className="flex items-center py-4">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center py-4 space-y-4 sm:space-y-0 sm:space-x-2">
         <Input
           placeholder={`Search ${searchKey}...`}
           value={(table.getColumn(searchKey)?.getFilterValue() as string) ?? ""}
           onChange={(event) =>
             table.getColumn(searchKey)?.setFilterValue(event.target.value)
           }
-          className="w-full md:max-w-sm"
+          className="w-full sm:max-w-xs md:max-w-sm"
         />
         <Popover open={open} onOpenChange={setOpen}>
           <PopoverTrigger asChild>
             <Button
               variant="outline"
-              className="inline-flex items-center justify-center whitespace-nowrap font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 border border-input bg-background shadow-sm hover:bg-accent hover:text-accent-foreground rounded-md px-3 text-sm h-9 border-dashed ml-2"
+              className="inline-flex items-center justify-center whitespace-nowrap font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 border border-input bg-background shadow-sm hover:bg-accent hover:text-accent-foreground rounded-md px-3 text-sm h-9 border-dashed"
             >
-              {selectedStatus ? (
+              {selectedStatuses.length > 0 ? (
                 <>
-                  <selectedStatus.icon className="mr-2 h-4 w-4 shrink-0" />
-                  {selectedStatus.label}
+                  <CirclePlusIcon className="mr-2 h-4 w-4" /> Status
+                  <Separator orientation="vertical" className="mx-2" />
+                  {selectedStatuses.length > 2 ? (
+                    <span className="inline-flex items-center border py-0.5 text-xs transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 border-transparent bg-secondary text-secondary-foreground hover:bg-secondary/80 rounded-sm px-1 font-normal">
+                      {selectedStatuses.length} selected
+                    </span>
+                  ) : (
+                    selectedStatuses.map((status) => (
+                      <span
+                        key={status.value}
+                        className="inline-flex items-center border py-0.5 text-xs transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 border-transparent bg-secondary text-secondary-foreground hover:bg-secondary/80 rounded-sm px-1 mr-1 font-normal"
+                      >
+                        {status.label}
+                      </span>
+                    ))
+                  )}
                 </>
               ) : (
                 <>
@@ -314,35 +340,39 @@ export function DataTable<TData, TValue>({
                   {statuses.map((status) => (
                     <CommandItem
                       key={status.value}
-                      value={status.value}
-                      onSelect={(value) => {
-                        setSelectedStatus(
-                          statuses.find(
-                            (priority) => priority.value === value
-                          ) || null
-                        );
-                        setOpen(false);
-                      }}
+                      onSelect={() => handleSelect(status)}
+                      className="cursor-pointer"
                     >
-                      <status.icon
-                        className={cn(
-                          "mr-2 h-4 w-4",
-                          status.value === selectedStatus?.value
-                            ? "opacity-100"
-                            : "opacity-40"
+                      <Checkbox
+                        id={status.value}
+                        checked={selectedStatuses.some(
+                          (s) => s.value === status.value
                         )}
+                        onCheckedChange={() => handleSelect(status)}
+                        className="mr-2"
                       />
+                      <status.icon className="mr-2 h-4 w-4 shrink-0" />
                       <span>{status.label}</span>
                     </CommandItem>
                   ))}
                 </CommandGroup>
+                <CommandSeparator />
+                {selectedStatuses.length > 0 && (
+                  <CommandItem
+                    onSelect={clearFilter}
+                    className="mt-2 text-red-500 cursor-pointer"
+                  >
+                    <XCircle className="mr-2 h-4 w-4" />
+                    Clear Filter
+                  </CommandItem>
+                )}
               </CommandList>
             </Command>
           </PopoverContent>
         </Popover>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="outline" className="ml-auto">
+            <Button variant="outline">
               <Settings2Icon className="mr-2 h-4 w-4" /> View
             </Button>
           </DropdownMenuTrigger>
@@ -356,7 +386,7 @@ export function DataTable<TData, TValue>({
                 return (
                   <DropdownMenuCheckboxItem
                     key={column.id}
-                    className="capitalize"
+                    className="capitalize cursor-pointer"
                     checked={column.getIsVisible()}
                     onCheckedChange={(value) =>
                       column.toggleVisibility(!!value)
@@ -369,6 +399,7 @@ export function DataTable<TData, TValue>({
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
+
       <ScrollArea className="h-[calc(80vh-220px)] rounded-md border">
         <Table className="relative">
           <TableHeader>

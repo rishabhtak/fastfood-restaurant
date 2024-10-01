@@ -28,6 +28,7 @@ export const userColumns: ColumnDef<userType>[] = [
     accessorKey: "first_name",
     header: "NAME",
     id: "name",
+    enableHiding: false,
   },
   {
     accessorKey: "country",
