@@ -1,6 +1,6 @@
-import Breadcrumbs from "@/components/Admin/Breadcrumbs";
+import Breadcrumbs from "@/components/Breadcrumbs";
 import PageContainer from "@/components/Admin/PageContainer";
-import { userColumns } from "@/components/Admin/UserTable/userColumns";
+import { userColumns } from "@/components/Admin/User/userColumns";
 import { buttonVariants } from "@/components/ui/button";
 import { Heading } from "@/components/ui/heading";
 import { Separator } from "@/components/ui/separator";
@@ -29,7 +29,7 @@ export default async function page({ searchParams }: paramsProps) {
 
   const res = await fetch(
     `https://api.slingacademy.com/v1/sample-data/users?offset=${offset}&limit=${pageLimit}` +
-      (country ? `&search=${country}` : '')
+      (country ? `&search=${country}` : "")
   );
   const userRes = await res.json();
   const totalUsers = userRes.total_users; //1000
@@ -41,14 +41,11 @@ export default async function page({ searchParams }: paramsProps) {
         <Breadcrumbs items={breadcrumbItems} />
 
         <div className="flex items-start justify-between">
-          <Heading
-            title={`User (${totalUsers})`}
-            description="Manage Users (Server side table functionalities.)"
-          />
+          <Heading title={`User (${totalUsers})`} />
 
           <Link
-            href={'/dashboard/employee/new'}
-            className={cn(buttonVariants({ variant: 'default' }))}
+            href={"/dashboard/employee/new"}
+            className={cn(buttonVariants({ variant: "default" }))}
           >
             <Plus className="mr-2 h-4 w-4" /> Add New
           </Link>
@@ -67,4 +64,3 @@ export default async function page({ searchParams }: paramsProps) {
     </PageContainer>
   );
 }
-

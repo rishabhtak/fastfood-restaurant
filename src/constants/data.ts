@@ -1,5 +1,4 @@
 import { NavItem } from "@/types/navItem";
-
 export type User = {
   id: number;
   name: string;
@@ -124,10 +123,10 @@ export const navItems: NavItem[] = [
     label: 'user'
   },
   {
-    title: 'Employee',
-    href: '/admin/dashboard/employee',
-    icon: 'employee',
-    label: 'employee'
+    title: 'Inventory',
+    href: '/admin/dashboard/inventory',
+    icon: 'inventory',
+    label: 'inventory'
   },
   {
     title: 'Profile',
