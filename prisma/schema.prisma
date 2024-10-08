@@ -13,3 +13,13 @@ model User {
   name      String?
   createdAt DateTime @default(now())
 }
+
+model Inventory {
+  id          Int      @id @default(autoincrement())
+  name        String
+  description String
+  price       Int
+  image       Json
+  category    String
+  createdAt   DateTime @default(now())
+}

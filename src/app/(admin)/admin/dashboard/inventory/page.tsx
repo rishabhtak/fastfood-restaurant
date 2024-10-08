@@ -12,14 +12,13 @@ const breadcrumbItems = [
   { title: "Inventory", link: "/dashboard/inventory" },
 ];
 export default function page() {
+
   return (
     <PageContainer>
       <div className="space-y-4">
         <Breadcrumbs items={breadcrumbItems} />
         <div className="flex items-start justify-between">
-          <Heading
-            title="Inventory Total (1000)"
-          />
+          <Heading title="Inventory Total (1000)" />
 
           <Link
             href={"/admin/dashboard/inventory/new"}

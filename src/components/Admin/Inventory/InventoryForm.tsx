@@ -29,22 +29,19 @@ import {
 } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/components/ui/use-toast";
-// import FileUpload from "../file-upload";
+import { inventoryType } from "@/types/inventoryType";
+import { url } from "inspector";
 const ImgSchema = z.object({
-  fileName: z.string(),
-  fileSize: z.number(),
-  fileKey: z.string(),
-  fileUrl: z.string(),
+  url: z.string(),
+  file: z.instanceof(File),
+  altText: z.string().optional(),
 });
 export const IMG_MAX_LIMIT = 1;
 const formSchema = z.object({
   name: z
     .string()
     .min(3, { message: "Item Name must be at least 3 characters" }),
-  imgUrl: z
-    .array(ImgSchema)
-    .max(IMG_MAX_LIMIT, { message: "You can only add up to 3 images" })
-    .min(1, { message: "At least one image must be added." }),
+  image: ImgSchema,
   description: z
     .string()
     .min(3, { message: "Item description must be at least 3 characters" }),
@@ -70,7 +67,7 @@ export const InventoryForm: React.FC<InventoryFormProps> = ({
   const [loading, setLoading] = useState(false);
   const [imgLoading, setImgLoading] = useState(false);
   const title = initialData ? "Edit product" : "Create product";
-  const description = initialData ? "Edit a product." : "Add a new product";
+  // const description = initialData ? "Edit a product." : "Add a new product";
   const toastMessage = initialData ? "Product updated." : "Product created.";
   const action = initialData ? "Save changes" : "Create";
 
@@ -80,59 +77,116 @@ export const InventoryForm: React.FC<InventoryFormProps> = ({
         name: "",
         description: "",
         price: 0,
-        imgUrl: [],
+        image: {},
         category: "",
       };
 
-
   const form = useForm<InventoryFormValues>({
-    resolver: zodResolver(formSchema),
+    // resolver: zodResolver(formSchema),
     defaultValues,
   });
-
   const onSubmit = async (data: InventoryFormValues) => {
-    console.log("imgUrl", data);
-
-  /*  try {
-      setLoading(true);
-      if (initialData) {
-        // await axios.post(`/api/products/edit-product/${initialData._id}`, data);
-      } else {
-        // const res = await axios.post(`/api/products/create-product`, data);
-        // console.log("product", res);
-      }
-      router.refresh();
-      router.push(`/dashboard/products`);
-      toast({
-        variant: "destructive",
-        title: "Uh oh! Something went wrong.",
-        description: "There was a problem with your request.",
-      });
-    } catch (error: any) {
-      toast({
-        variant: "destructive",
-        title: "Uh oh! Something went wrong.",
-        description: "There was a problem with your request.",
-      });
-    } finally {
-      setLoading(false);
-    }*/
-  };
-
-  const onDelete = async () => {
     try {
       setLoading(true);
-      //   await axios.delete(`/api/${params.storeId}/products/${params.productId}`);
-      router.refresh();
-      router.push(`/${params.storeId}/products`);
-    } catch (error: any) {
+
+      let imageData = data.image; // Since only one image is allowed
+
+      let uploadedImage = null;
+      let deletedImage = null;
+
+      // If updating, handle image deletions
+      if (initialData?.image) {
+        // Check if the existing image is different from the new one
+        if (initialData?.image?.url !== imageData?.url) {
+          deletedImage = initialData?.image;
+
+          // Delete the image from Cloudinary
+          await fetch(`/api/uploadImage/?url=${deletedImage.url}`, {
+            method: "DELETE",
+          });
+        }
+      }
+
+      // If there's a new image and it doesn't have a alttext (means it's a fresh upload)
+      if (!imageData?.altText) {
+        // Upload the image to Cloudinary
+        const formData = new FormData();
+        formData.append("file", imageData?.file); // New image to upload
+        formData.append("upload_preset", "uploadimage_cloudinary");
+
+        const response = await fetch(`/api/uploadImage`, {
+          method: "POST",
+          body: formData,
+        });
+
+        const result = await response.json();
+        uploadedImage = {
+          url: result?.uploadedImageData?.secure_url,
+          altText: result?.uploadedImageData?.original_filename,
+        };
+      }
+
+      // If no new image was uploaded, keep the existing one
+      const finalImage = uploadedImage ? uploadedImage : initialData?.image;
+
+      // Prepare the final inventory data, including image metadata
+      const inventoryData = {
+        ...data,
+        image: finalImage,
+        price: parseFloat(data.price.toString()),
+      };
+
+      // Sending data to your API using fetch (for update or create)
+      if (initialData?.id) {
+        const id = initialData.id;
+        // Update inventory
+        const res = await fetch(`/api/inventory`, {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            id,
+            inventoryData,
+          }),
+        });
+        const response = await res.json();
+        console.log("update", response);
+      } else {
+        console.log("inventoryData", inventoryData);
+        // Create new product
+        const res = await fetch(`/api/inventory`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(inventoryData),
+        });
+        const response = await res.json();
+        console.log("inventoryadd", response);
+      }
+
+      // router.refresh();
+      //  router.push(`/admin/dashboard/inventory`);
+      toast({
+        variant: "success",
+        title: initialData
+          ? "Product updated successfully"
+          : "Product created successfully",
+      });
+    } catch (error) {
+      console.log(error);
+      toast({
+        variant: "destructive",
+        title: "Uh oh! Something went wrong.",
+        description: "There was a problem with your request.",
+      });
     } finally {
       setLoading(false);
-      setOpen(false);
     }
   };
 
-  const triggerImgUrlValidation = () => form.trigger("imgUrl");
+  const triggerImgUrlValidation = () => form.trigger("image");
 
   return (
     <>
@@ -144,7 +198,7 @@ export const InventoryForm: React.FC<InventoryFormProps> = ({
       /> */}
       <div className="flex items-center justify-between">
         <Heading title={title} />
-        {initialData && (
+        {/* {initialData && (
           <Button
             disabled={loading}
             variant="destructive"
@@ -153,7 +207,7 @@ export const InventoryForm: React.FC<InventoryFormProps> = ({
           >
             <Trash className="h-4 w-4" />
           </Button>
-        )}
+        )} */}
       </div>
       <Separator />
       <Form {...form}>
@@ -161,27 +215,10 @@ export const InventoryForm: React.FC<InventoryFormProps> = ({
           onSubmit={form.handleSubmit(onSubmit)}
           className="w-full space-y-8"
         >
-          {/*  <FormField
-            control={form.control}
-            name="imgUrl"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Images</FormLabel>
-                <FormControl>
-                  <FileUpload
-                    onChange={field.onChange}
-                    value={field.value}
-                    onRemove={field.onChange}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          /> */}
           <div className="gap-8 md:grid md:grid-cols-3">
             <FormField
               control={form.control}
-              name="imgUrl"
+              name="image"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Images</FormLabel>
