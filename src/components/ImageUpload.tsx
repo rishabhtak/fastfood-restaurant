@@ -13,12 +13,8 @@ export const ImageUpload = ({
   onRemove,
   value,
 }: ImageUploadProps) => {
- // console.log("imageupload", value);
-  // console.log("imageupload", value);
-
   const deleteImg = () => {
-    // console.log("imagedelete", link);
-    onRemove({}); // update the images on delete
+    onRemove({});
   };
 
   const uploadImage = (e: any) => {
@@ -32,7 +28,6 @@ export const ImageUpload = ({
 
       // update the form with the new image
       onChange?.(newImage);
-      //  setPreview(newImageUrl);
     }
   };
 

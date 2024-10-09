@@ -32,7 +32,7 @@ export default async function Page({ params }: paramsProps) {
   const res = await response.json();
   let inventory: inventoryType | null = res.inventory;
 
- // console.log("inventory", inventory);
+//  console.log("inventory", inventory);
   // params { inventoryid: '1' }
   return (
     <ScrollArea className="h-full">

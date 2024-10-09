@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import ImageUpload from "@/components/ImageUpload";
+import Link from "next/link";
 import {
   Form,
   FormControl,
@@ -30,13 +31,14 @@ import {
 import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/components/ui/use-toast";
 import { inventoryType } from "@/types/inventoryType";
-import { url } from "inspector";
+
 const ImgSchema = z.object({
   url: z.string(),
-  file: z.instanceof(File),
+  file: z.instanceof(File).optional(),
   altText: z.string().optional(),
 });
-export const IMG_MAX_LIMIT = 1;
+
+// export const IMG_MAX_LIMIT = 1;
 const formSchema = z.object({
   name: z
     .string()
@@ -45,7 +47,7 @@ const formSchema = z.object({
   description: z
     .string()
     .min(3, { message: "Item description must be at least 3 characters" }),
-  price: z.coerce.number(),
+  price: z.coerce.number().min(1, { message: "Please enter a vaild price" }),
   category: z.string().min(1, { message: "Please select a category" }),
 });
 
@@ -76,20 +78,22 @@ export const InventoryForm: React.FC<InventoryFormProps> = ({
     : {
         name: "",
         description: "",
-        price: 0,
+        price: "",
         image: {},
         category: "",
       };
 
   const form = useForm<InventoryFormValues>({
-    // resolver: zodResolver(formSchema),
+    resolver: zodResolver(formSchema),
     defaultValues,
   });
+
   const onSubmit = async (data: InventoryFormValues) => {
+    console.log("submit", data);
     try {
       setLoading(true);
 
-      let imageData = data.image; // Since only one image is allowed
+      let imageData = data.image;
 
       let uploadedImage = null;
       let deletedImage = null;
@@ -108,7 +112,7 @@ export const InventoryForm: React.FC<InventoryFormProps> = ({
       }
 
       // If there's a new image and it doesn't have a alttext (means it's a fresh upload)
-      if (!imageData?.altText) {
+      if (imageData?.file) {
         // Upload the image to Cloudinary
         const formData = new FormData();
         formData.append("file", imageData?.file); // New image to upload
@@ -140,7 +144,7 @@ export const InventoryForm: React.FC<InventoryFormProps> = ({
       if (initialData?.id) {
         const id = initialData.id;
         // Update inventory
-        const res = await fetch(`/api/inventory`, {
+        await fetch(`/api/inventory`, {
           method: "PUT",
           headers: {
             "Content-Type": "application/json",
@@ -150,24 +154,20 @@ export const InventoryForm: React.FC<InventoryFormProps> = ({
             inventoryData,
           }),
         });
-        const response = await res.json();
-        console.log("update", response);
       } else {
-        console.log("inventoryData", inventoryData);
         // Create new product
-        const res = await fetch(`/api/inventory`, {
+        await fetch(`/api/inventory`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
           body: JSON.stringify(inventoryData),
         });
-        const response = await res.json();
-        console.log("inventoryadd", response);
       }
 
-      // router.refresh();
-      //  router.push(`/admin/dashboard/inventory`);
+      router.push(`/admin/dashboard/inventory`);
+      router.refresh();
+
       toast({
         variant: "success",
         title: initialData
@@ -274,7 +274,12 @@ export const InventoryForm: React.FC<InventoryFormProps> = ({
                 <FormItem>
                   <FormLabel>Price</FormLabel>
                   <FormControl>
-                    <Input type="number" disabled={loading} {...field} />
+                    <Input
+                      type="number"
+                      disabled={loading}
+                      placeholder="Item Price"
+                      {...field}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -317,6 +322,11 @@ export const InventoryForm: React.FC<InventoryFormProps> = ({
           <Button disabled={loading} className="ml-auto" type="submit">
             {action}
           </Button>
+          <Link href={`/admin/dashboard/inventory`}>
+            <Button disabled={loading} variant="outline" className="ml-2">
+              Cancel
+            </Button>
+          </Link>
         </form>
       </Form>
     </>

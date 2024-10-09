@@ -11,7 +11,7 @@ import {
   SortingState,
   getSortedRowModel,
 } from "@tanstack/react-table";
-import React from "react";
+import { useState, useEffect, useCallback } from "react";
 import { cn } from "@/lib/utils";
 
 import { Button } from "@/components/ui/button";
@@ -83,13 +83,14 @@ interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
   searchKey: string;
-  pageNo: number;
-  totalUsers: number;
+ // pageNo: number;
+ // totalInventory: number;
   pageSizeOptions?: number[];
   pageCount: number;
   searchParams?: {
     [key: string]: string | string[] | undefined;
   };
+  statusBox: boolean;
 }
 
 type Status = {
@@ -129,18 +130,21 @@ const statuses: Status[] = [
 export function DataTable<TData, TValue>({
   columns,
   data,
-  pageNo,
   searchKey,
-  totalUsers,
+  //pageNo,
+ // totalInventory,
   pageCount,
+  statusBox,
   pageSizeOptions = [10, 20, 30, 40, 50],
 }: DataTableProps<TData, TValue>) {
-  const [open, setOpen] = React.useState(false);
-  const [columnVisibility, setColumnVisibility] =
-    React.useState<VisibilityState>({});
+  const [open, setOpen] = useState<boolean>(false);
+  const [searchTerm, setSearchTerm] = useState<string>("");
+  const [debouncedSearchTerm, setDebouncedSearchTerm] =
+    useState<string>(searchTerm);
+  const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
 
-  const [sorting, setSorting] = React.useState<SortingState>([]);
-  const [selectedStatuses, setSelectedStatuses] = React.useState<Status[]>([]);
+  const [sorting, setSorting] = useState<SortingState>([]);
+  const [selectedStatuses, setSelectedStatuses] = useState<Status[]>([]);
   // console.log('employee', data);
   const router = useRouter();
   const pathname = usePathname();
@@ -158,7 +162,7 @@ export function DataTable<TData, TValue>({
   console.log("value", table.getFilteredSelectedRowModel()); */
 
   // Create query string
-  const createQueryString = React.useCallback(
+  const createQueryString = useCallback(
     (params: Record<string, string | number | null>) => {
       const newSearchParams = new URLSearchParams(searchParams?.toString());
 
@@ -176,13 +180,23 @@ export function DataTable<TData, TValue>({
   );
 
   // Handle server-side pagination
-  const [{ pageIndex, pageSize }, setPagination] =
-    React.useState<PaginationState>({
-      pageIndex: fallbackPage - 1,
-      pageSize: fallbackPerPage,
-    });
+  const [{ pageIndex, pageSize }, setPagination] = useState<PaginationState>({
+    pageIndex: fallbackPage - 1,
+    pageSize: fallbackPerPage,
+  });
 
-  React.useEffect(() => {
+  // Debounce effect
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedSearchTerm(searchTerm);
+    }, 500);
+
+    return () => {
+      clearTimeout(handler);
+    };
+  }, [searchTerm]);
+
+  useEffect(() => {
     router.push(
       `${pathname}?${createQueryString({
         page: pageIndex + 1,
@@ -216,65 +230,29 @@ export function DataTable<TData, TValue>({
     manualFiltering: true,
   });
 
-  const searchValue = table.getColumn(searchKey)?.getFilterValue() as string;
-
-  // React.useEffect(() => {
-  //   if (debounceValue.length > 0) {
-  //     router.push(
-  //       `${pathname}?${createQueryString({
-  //         [selectedOption.value]: `${debounceValue}${
-  //           debounceValue.length > 0 ? `.${filterVariety}` : ""
-  //         }`,
-  //       })}`,
-  //       {
-  //         scroll: false,
-  //       }
-  //     )
-  //   }
-
-  //   if (debounceValue.length === 0) {
-  //     router.push(
-  //       `${pathname}?${createQueryString({
-  //         [selectedOption.value]: null,
-  //       })}`,
-  //       {
-  //         scroll: false,
-  //       }
-  //     )
-  //   }
-  //   // eslint-disable-next-line react-hooks/exhaustive-deps
-  // }, [debounceValue, filterVariety, selectedOption.value])
-
-  React.useEffect(() => {
-    if (searchValue?.length > 0) {
+  // Effect to trigger the search when the debounced search term changes
+  useEffect(() => {
+    if (debouncedSearchTerm !== "") {
       router.push(
         `${pathname}?${createQueryString({
           page: null,
           limit: null,
-          search: searchValue,
+          search: debouncedSearchTerm.toString() || null,
         })}`,
-        {
-          scroll: false,
-        }
+        { scroll: false }
       );
-    }
-    if (searchValue?.length === 0 || searchValue === undefined) {
+    } else {
       router.push(
         `${pathname}?${createQueryString({
           page: null,
           limit: null,
           search: null,
         })}`,
-        {
-          scroll: false,
-        }
+        { scroll: false }
       );
     }
-
-    setPagination((prev) => ({ ...prev, pageIndex: 0 }));
-
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [searchValue]);
+  }, [debouncedSearchTerm]);
 
   // Toggle selection of a status
   const handleSelect = (status: Status) => {
@@ -293,83 +271,83 @@ export function DataTable<TData, TValue>({
       <div className="flex flex-col sm:flex-row items-start sm:items-center py-4 space-y-4 sm:space-y-0 sm:space-x-2">
         <Input
           placeholder={`Search ${searchKey}...`}
-          value={(table.getColumn(searchKey)?.getFilterValue() as string) ?? ""}
-          onChange={(event) =>
-            table.getColumn(searchKey)?.setFilterValue(event.target.value)
-          }
+          value={searchTerm}
+          onChange={(event) => setSearchTerm(event.target.value)}
           className="w-full sm:max-w-xs md:max-w-sm"
         />
-        <Popover open={open} onOpenChange={setOpen}>
-          <PopoverTrigger asChild>
-            <Button
-              variant="outline"
-              className="inline-flex items-center justify-center whitespace-nowrap font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 border border-input bg-background shadow-sm hover:bg-accent hover:text-accent-foreground rounded-md px-3 text-sm h-9 border-dashed"
-            >
-              {selectedStatuses.length > 0 ? (
-                <>
-                  <CirclePlusIcon className="mr-2 h-4 w-4" /> Status
-                  <Separator orientation="vertical" className="mx-2" />
-                  {selectedStatuses.length > 2 ? (
-                    <span className="inline-flex items-center border py-0.5 text-xs transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 border-transparent bg-secondary text-secondary-foreground hover:bg-secondary/80 rounded-sm px-1 font-normal">
-                      {selectedStatuses.length} selected
-                    </span>
-                  ) : (
-                    selectedStatuses.map((status) => (
-                      <span
-                        key={status.value}
-                        className="inline-flex items-center border py-0.5 text-xs transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 border-transparent bg-secondary text-secondary-foreground hover:bg-secondary/80 rounded-sm px-1 mr-1 font-normal"
-                      >
-                        {status.label}
+        {statusBox && (
+          <Popover open={open} onOpenChange={setOpen}>
+            <PopoverTrigger asChild>
+              <Button
+                variant="outline"
+                className="inline-flex items-center justify-center whitespace-nowrap font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 border border-input bg-background shadow-sm hover:bg-accent hover:text-accent-foreground rounded-md px-3 text-sm h-9 border-dashed"
+              >
+                {selectedStatuses.length > 0 ? (
+                  <>
+                    <CirclePlusIcon className="mr-2 h-4 w-4" /> Status
+                    <Separator orientation="vertical" className="mx-2" />
+                    {selectedStatuses.length > 2 ? (
+                      <span className="inline-flex items-center border py-0.5 text-xs transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 border-transparent bg-secondary text-secondary-foreground hover:bg-secondary/80 rounded-sm px-1 font-normal">
+                        {selectedStatuses.length} selected
                       </span>
-                    ))
-                  )}
-                </>
-              ) : (
-                <>
-                  <CirclePlusIcon className="mr-2 h-4 w-4" /> Status
-                </>
-              )}
-            </Button>
-          </PopoverTrigger>
-          <PopoverContent className="p-0" align="start">
-            <Command>
-              <CommandInput placeholder="Change status..." />
-              <CommandList>
-                <CommandEmpty>No results found.</CommandEmpty>
-                <CommandGroup>
-                  {statuses.map((status) => (
-                    <CommandItem
-                      key={status.value}
-                      onSelect={() => handleSelect(status)}
-                      className="cursor-pointer"
-                    >
-                      <Checkbox
-                        id={status.value}
-                        checked={selectedStatuses.some(
-                          (s) => s.value === status.value
-                        )}
-                        onCheckedChange={() => handleSelect(status)}
-                        className="mr-2"
-                      />
-                      <status.icon className="mr-2 h-4 w-4 shrink-0" />
-                      <span>{status.label}</span>
-                    </CommandItem>
-                  ))}
-                </CommandGroup>
-                <CommandSeparator />
-                {selectedStatuses.length > 0 && (
-                  <CommandItem
-                    onSelect={clearFilter}
-                    className="mt-2 text-red-500 cursor-pointer"
-                  >
-                    <XCircle className="mr-2 h-4 w-4" />
-                    Clear Filter
-                  </CommandItem>
+                    ) : (
+                      selectedStatuses.map((status) => (
+                        <span
+                          key={status.value}
+                          className="inline-flex items-center border py-0.5 text-xs transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 border-transparent bg-secondary text-secondary-foreground hover:bg-secondary/80 rounded-sm px-1 mr-1 font-normal"
+                        >
+                          {status.label}
+                        </span>
+                      ))
+                    )}
+                  </>
+                ) : (
+                  <>
+                    <CirclePlusIcon className="mr-2 h-4 w-4" /> Status
+                  </>
                 )}
-              </CommandList>
-            </Command>
-          </PopoverContent>
-        </Popover>
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="p-0" align="start">
+              <Command>
+                <CommandInput placeholder="Change status..." />
+                <CommandList>
+                  <CommandEmpty>No results found.</CommandEmpty>
+                  <CommandGroup>
+                    {statuses.map((status) => (
+                      <CommandItem
+                        key={status.value}
+                        onSelect={() => handleSelect(status)}
+                        className="cursor-pointer"
+                      >
+                        <Checkbox
+                          id={status.value}
+                          checked={selectedStatuses.some(
+                            (s) => s.value === status.value
+                          )}
+                          onCheckedChange={() => handleSelect(status)}
+                          className="mr-2"
+                        />
+                        <status.icon className="mr-2 h-4 w-4 shrink-0" />
+                        <span>{status.label}</span>
+                      </CommandItem>
+                    ))}
+                  </CommandGroup>
+                  <CommandSeparator />
+                  {selectedStatuses.length > 0 && (
+                    <CommandItem
+                      onSelect={clearFilter}
+                      className="mt-2 text-red-500 cursor-pointer"
+                    >
+                      <XCircle className="mr-2 h-4 w-4" />
+                      Clear Filter
+                    </CommandItem>
+                  )}
+                </CommandList>
+              </Command>
+            </PopoverContent>
+          </Popover>
+        )}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="outline">

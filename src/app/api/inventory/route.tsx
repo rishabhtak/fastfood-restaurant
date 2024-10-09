@@ -1,10 +1,8 @@
-import { NextResponse } from "next/server";
+import { NextResponse, NextRequest } from "next/server";
 import prisma from "@/lib/prisma";
 import { inventoryType } from "@/types/inventoryType";
 
-export async function POST(req: Request): Promise<NextResponse> {
-  console.log("add");
-
+export async function POST(req: NextRequest): Promise<NextResponse> {
   try {
     const { name, description, price, image, category }: inventoryType =
       await req.json();
@@ -23,11 +21,15 @@ export async function POST(req: Request): Promise<NextResponse> {
   }
 }
 
-export async function GET(req: Request): Promise<NextResponse> {
+export async function GET(req: NextRequest): Promise<NextResponse> {
   try {
     const { searchParams } = new URL(req.url);
+
     const idParam = searchParams.get("id");
+    const offset = Number(searchParams.get("offset"));
+    const limit = Number(searchParams.get("limit"));
     const id = idParam ? Number(idParam) : null;
+    const itemName = searchParams.get("search");
 
     if (id && !isNaN(id) && id > 0) {
       const inventory = await prisma.inventory.findUnique({
@@ -41,13 +43,31 @@ export async function GET(req: Request): Promise<NextResponse> {
           status: 404,
         });
       }
-      //  console.log("inventories route", inventory);
 
       return NextResponse.json({ inventory, message: "Success", status: 200 });
     } else if (!idParam) {
-      const inventories = await prisma.inventory.findMany();
+      const [inventories, count] = await Promise.all([
+        prisma.inventory.findMany({
+          skip: offset,
+          take: limit,
+          where: {
+            name: {
+              contains: itemName ?? "",
+            },
+          },
+        }),
+        prisma.inventory.count({
+          where: {
+            name: {
+              contains: itemName ?? "",
+            },
+          },
+        }),
+      ]);
+
       return NextResponse.json({
         inventories,
+        count,
         message: "Success",
         status: 200,
       });
@@ -67,7 +87,7 @@ export async function GET(req: Request): Promise<NextResponse> {
   }
 }
 
-export async function PUT(req: Request): Promise<NextResponse> {
+export async function PUT(req: NextRequest): Promise<NextResponse> {
   try {
     const body = await req.json();
     const { name, description, price, image, category }: inventoryType =
@@ -96,6 +116,38 @@ export async function PUT(req: Request): Promise<NextResponse> {
   } catch (error) {
     return NextResponse.json({
       message: "Error updating inventory",
+      status: 500,
+    });
+  }
+}
+
+export async function DELETE(req: NextRequest): Promise<NextResponse> {
+  try {
+    const { searchParams } = new URL(req.url);
+    const idParam = searchParams.get("id");
+    const id = idParam ? Number(idParam) : null;
+
+    // Ensure ID is valid
+    if (!id || isNaN(id)) {
+      return NextResponse.json({
+        message: "Invalid ID",
+        status: 400,
+      });
+    } else {
+      // Delete the inventory item
+      const deletedInventory = await prisma.inventory.delete({
+        where: { id },
+      });
+
+      return NextResponse.json({
+        deletedInventory,
+        message: "Inventory deleted successfully",
+        status: 200,
+      });
+    }
+  } catch (error) {
+    return NextResponse.json({
+      message: "Error deleting inventory",
       status: 500,
     });
   }

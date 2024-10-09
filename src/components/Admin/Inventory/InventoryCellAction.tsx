@@ -19,22 +19,51 @@ import {
   DropdownMenuLabel,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { userType } from "@/types/userType";
+import { inventoryType } from "@/types/inventoryType";
 import { Edit, MoreHorizontal, Trash } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
 import { useState } from "react";
 
 interface CellActionProps {
-  data: userType;
+  data: inventoryType;
 }
 
-export const CellAction: React.FC<CellActionProps> = ({ data }) => {
+export const InventoryCellAction: React.FC<CellActionProps> = ({ data }) => {
   const [loading, setLoading] = useState<boolean>(false);
   const [open, setOpen] = useState<boolean>(false);
   const router = useRouter();
 
   const onConfirm = async () => {
-    
+    try {
+      // Send both requests in parallel
+      const [deleteInventoryResponse, deleteImageResponse] = await Promise.all([
+        fetch(`/api/inventory/?id=${data?.id}`, { method: "DELETE" }),
+        data?.image?.url
+          ? fetch(`/api/uploadImage/?url=${data?.image?.url}`, {
+              method: "DELETE",
+            })
+          : Promise.resolve({ ok: true }),
+      ]);
+
+      // Handle inventory deletion response
+      if (!deleteInventoryResponse.ok) {
+        throw new Error(deleteInventoryResponse.statusText);
+      }
+
+      // Handle image deletion response
+      if (!deleteImageResponse.ok) {
+        throw new Error(
+          deleteImageResponse instanceof Response
+            ? deleteImageResponse.statusText
+            : "Error deleting image"
+        );
+      }
+      router.refresh();
+      console.log("Successfully deleted inventory and image (if present)");
+    } catch (error) {
+      console.error("Error during deletion:", error);
+      router.refresh();
+    }
   };
 
   return (
@@ -51,7 +80,7 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction>Continue</AlertDialogAction>
+            <AlertDialogAction onClick={onConfirm}>Continue</AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
@@ -67,7 +96,7 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
           <DropdownMenuLabel>Actions</DropdownMenuLabel>
 
           <DropdownMenuItem
-            onClick={() => router.push(`/dashboard/user/${data.id}`)}
+            onClick={() => router.push(`/admin/dashboard/inventory/${data.id}`)}
           >
             <Edit className="mr-2 h-4 w-4" /> Update
           </DropdownMenuItem>

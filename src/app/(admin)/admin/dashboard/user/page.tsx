@@ -59,6 +59,7 @@ export default async function page({ searchParams }: paramsProps) {
           totalUsers={totalUsers}
           data={user}
           pageCount={pageCount}
+          statusBox={true}
         />
       </div>
     </PageContainer>

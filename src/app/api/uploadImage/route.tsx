@@ -1,8 +1,8 @@
-import { NextResponse } from "next/server";
+import { NextResponse,NextRequest } from "next/server";
 import sha1 from "sha1";
 
 // Type for the POST request
-export async function POST(req: Request): Promise<NextResponse> {
+export async function POST(req: NextRequest): Promise<NextResponse> {
   try {
     const formData = await req.formData();
     const img = formData.get("file");
@@ -31,7 +31,7 @@ export async function POST(req: Request): Promise<NextResponse> {
 }
 
 // Type for the DELETE request
-export async function DELETE(req: Request): Promise<NextResponse> {
+export async function DELETE(req: NextRequest): Promise<NextResponse> {
   try {
     const { searchParams } = new URL(req.url);
     const url = searchParams.get("url");
