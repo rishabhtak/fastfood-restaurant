@@ -30,7 +30,9 @@ import { useToast } from "@/components/ui/use-toast";
 import { inventoryType } from "@/types/inventoryType";
 
 const ImgSchema = z.object({
-  url: z.string(),
+  url: z.string({
+    required_error: "Image is required",
+  }),
   file: z.instanceof(File).optional(),
   altText: z.string().optional(),
 });
@@ -82,7 +84,11 @@ export const InventoryForm: React.FC<InventoryFormProps> = ({
         category: "",
       };
 
-  const form = useForm<InventoryFormValues>({
+  const {
+    formState: { errors },
+    control,
+    handleSubmit,
+  } = useForm<InventoryFormValues>({
     resolver: zodResolver(formSchema),
     defaultValues,
   });
@@ -193,8 +199,6 @@ export const InventoryForm: React.FC<InventoryFormProps> = ({
     }
   };
 
-  const triggerImgUrlValidation = () => form.trigger("image");
-
   return (
     <>
       {loading && (
@@ -210,18 +214,20 @@ export const InventoryForm: React.FC<InventoryFormProps> = ({
         <Heading title={title} />
       </div>
       <Separator />
-      <Form {...form}>
-        <form
-          onSubmit={form.handleSubmit(onSubmit)}
-          className="w-full space-y-8"
-        >
+      <Form
+        {...useForm({
+          resolver: zodResolver(formSchema),
+          defaultValues,
+        })}
+      >
+        <form onSubmit={handleSubmit(onSubmit)} className="w-full space-y-8">
           <div className="gap-8 md:grid md:grid-cols-3">
             <FormField
-              control={form.control}
+              control={control}
               name="image"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Images</FormLabel>
+                  <FormLabel>Image</FormLabel>
                   <FormControl>
                     <ImageUpload
                       onChange={field.onChange}
@@ -229,12 +235,14 @@ export const InventoryForm: React.FC<InventoryFormProps> = ({
                       onRemove={field.onChange}
                     />
                   </FormControl>
-                  <FormMessage />
+                  <FormMessage>
+                    {errors && <span>{errors?.image?.url?.message}</span>}
+                  </FormMessage>
                 </FormItem>
               )}
             />
             <FormField
-              control={form.control}
+              control={control}
               name="name"
               render={({ field }) => (
                 <FormItem>
@@ -242,12 +250,14 @@ export const InventoryForm: React.FC<InventoryFormProps> = ({
                   <FormControl>
                     <Input placeholder="Item name" {...field} />
                   </FormControl>
-                  <FormMessage />
+                  <FormMessage>
+                    {errors && <span>{errors?.name?.message}</span>}
+                  </FormMessage>
                 </FormItem>
               )}
             />
             <FormField
-              control={form.control}
+              control={control}
               name="description"
               render={({ field }) => (
                 <FormItem>
@@ -255,12 +265,14 @@ export const InventoryForm: React.FC<InventoryFormProps> = ({
                   <FormControl>
                     <Textarea placeholder="Item description" {...field} />
                   </FormControl>
-                  <FormMessage />
+                  <FormMessage>
+                    {errors && <span>{errors?.description?.message}</span>}
+                  </FormMessage>
                 </FormItem>
               )}
             />
             <FormField
-              control={form.control}
+              control={control}
               name="price"
               render={({ field }) => (
                 <FormItem>
@@ -268,12 +280,14 @@ export const InventoryForm: React.FC<InventoryFormProps> = ({
                   <FormControl>
                     <Input type="number" placeholder="Item Price" {...field} />
                   </FormControl>
-                  <FormMessage />
+                  <FormMessage>
+                    {errors && <span>{errors?.price?.message}</span>}
+                  </FormMessage>
                 </FormItem>
               )}
             />
             <FormField
-              control={form.control}
+              control={control}
               name="category"
               render={({ field }) => (
                 <FormItem>
@@ -300,7 +314,9 @@ export const InventoryForm: React.FC<InventoryFormProps> = ({
                       ))}
                     </SelectContent>
                   </Select>
-                  <FormMessage />
+                  <FormMessage>
+                    {errors && <span>{errors?.category?.message}</span>}
+                  </FormMessage>
                 </FormItem>
               )}
             />
