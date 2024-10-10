@@ -4,9 +4,12 @@ import { createContext, useState } from "react";
 export const Context = createContext({});
 
 const ContextProvider = ({ children }: { children: React.ReactNode }) => {
-  const [isMinimized, setisMinimized] = useState<boolean>(false);
+  const [isMinimized, setIsMinimized] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   return (
-    <Context.Provider value={{ isMinimized, setisMinimized }}>
+    <Context.Provider
+      value={{ isMinimized, setIsMinimized, isLoading, setIsLoading }}
+    >
       {children}
     </Context.Provider>
   );

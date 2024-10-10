@@ -13,16 +13,16 @@ type SidebarProps = {
 
 interface isMinimizedProps {
   isMinimized: boolean;
-  setisMinimized: React.Dispatch<React.SetStateAction<boolean>>;
+  setIsMinimized: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 export default function Sidebar({ className }: SidebarProps) {
-  const { isMinimized, setisMinimized } = useContext(
+  const { isMinimized, setIsMinimized } = useContext(
     Context
   ) as isMinimizedProps;
 
   const handleToggle = () => {
-    setisMinimized((prev) => !prev);
+    setIsMinimized((prev) => !prev);
   };
 
   return (

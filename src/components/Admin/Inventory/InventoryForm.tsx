@@ -3,8 +3,7 @@ import * as z from "zod";
 import { useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { Trash } from "lucide-react";
-import { useParams, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
@@ -13,7 +12,6 @@ import Link from "next/link";
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -28,7 +26,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/components/ui/use-toast";
 import { inventoryType } from "@/types/inventoryType";
 
@@ -38,7 +35,6 @@ const ImgSchema = z.object({
   altText: z.string().optional(),
 });
 
-// export const IMG_MAX_LIMIT = 1;
 const formSchema = z.object({
   name: z
     .string()
@@ -54,23 +50,26 @@ const formSchema = z.object({
 type InventoryFormValues = z.infer<typeof formSchema>;
 
 interface InventoryFormProps {
-  initialData: any | null;
-  categories: any;
+  initialData: inventoryType | null;
 }
+
+interface Categories {
+  id: string;
+  name: string;
+}
+
+const categories: Categories[] = [
+  { id: "shirts", name: "shirts" },
+  { id: "pants", name: "pants" },
+];
 
 export const InventoryForm: React.FC<InventoryFormProps> = ({
   initialData,
-  categories,
 }) => {
-  const params = useParams();
   const router = useRouter();
   const { toast } = useToast();
-  const [open, setOpen] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [imgLoading, setImgLoading] = useState(false);
+  const [loading, setLoading] = useState<boolean>(false);
   const title = initialData ? "Edit product" : "Create product";
-  // const description = initialData ? "Edit a product." : "Add a new product";
-  const toastMessage = initialData ? "Product updated." : "Product created.";
   const action = initialData ? "Save changes" : "Create";
 
   const defaultValues = initialData
@@ -78,7 +77,7 @@ export const InventoryForm: React.FC<InventoryFormProps> = ({
     : {
         name: "",
         description: "",
-        price: "",
+        price: 0,
         image: {},
         category: "",
       };
@@ -89,7 +88,6 @@ export const InventoryForm: React.FC<InventoryFormProps> = ({
   });
 
   const onSubmit = async (data: InventoryFormValues) => {
-    console.log("submit", data);
     try {
       setLoading(true);
 
@@ -137,14 +135,14 @@ export const InventoryForm: React.FC<InventoryFormProps> = ({
       const inventoryData = {
         ...data,
         image: finalImage,
-        price: parseFloat(data.price.toString()),
+        // price: parseFloat(data.price.toString()),
       };
 
       // Sending data to your API using fetch (for update or create)
       if (initialData?.id) {
         const id = initialData.id;
         // Update inventory
-        await fetch(`/api/inventory`, {
+        const res = await fetch(`/api/inventory`, {
           method: "PUT",
           headers: {
             "Content-Type": "application/json",
@@ -154,32 +152,41 @@ export const InventoryForm: React.FC<InventoryFormProps> = ({
             inventoryData,
           }),
         });
+        if (!res.ok) {
+          throw new Error(res.statusText);
+        }
       } else {
         // Create new product
-        await fetch(`/api/inventory`, {
+        const res = await fetch(`/api/inventory`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
           body: JSON.stringify(inventoryData),
         });
+
+        if (!res.ok) {
+          throw new Error(res.statusText);
+        }
       }
 
       router.push(`/admin/dashboard/inventory`);
       router.refresh();
 
       toast({
-        variant: "success",
+        variant: "default",
+        duration: 2000,
         title: initialData
-          ? "Product updated successfully"
-          : "Product created successfully",
+          ? "Inventory updated successfully"
+          : "Inventory created successfully",
       });
     } catch (error) {
-      console.log(error);
       toast({
         variant: "destructive",
+        duration: 4000,
         title: "Uh oh! Something went wrong.",
-        description: "There was a problem with your request.",
+        description:
+          "There was a problem with your request. Please try again later.",
       });
     } finally {
       setLoading(false);
@@ -190,24 +197,17 @@ export const InventoryForm: React.FC<InventoryFormProps> = ({
 
   return (
     <>
-      {/* <AlertModal
-        isOpen={open}
-        onClose={() => setOpen(false)}
-        onConfirm={onDelete}
-        loading={loading}
-      /> */}
-      <div className="flex items-center justify-between">
+      {loading && (
+        <div className="loader-container">
+          <span className="loader"></span>
+        </div>
+      )}
+      <div
+        className={`flex items-center justify-between ${
+          loading ? "opacity-50 pointer-events-none" : ""
+        }`}
+      >
         <Heading title={title} />
-        {/* {initialData && (
-          <Button
-            disabled={loading}
-            variant="destructive"
-            size="sm"
-            onClick={() => setOpen(true)}
-          >
-            <Trash className="h-4 w-4" />
-          </Button>
-        )} */}
       </div>
       <Separator />
       <Form {...form}>
@@ -240,11 +240,7 @@ export const InventoryForm: React.FC<InventoryFormProps> = ({
                 <FormItem>
                   <FormLabel>Name</FormLabel>
                   <FormControl>
-                    <Input
-                      disabled={loading}
-                      placeholder="Item name"
-                      {...field}
-                    />
+                    <Input placeholder="Item name" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -257,11 +253,7 @@ export const InventoryForm: React.FC<InventoryFormProps> = ({
                 <FormItem>
                   <FormLabel>Description</FormLabel>
                   <FormControl>
-                    <Textarea
-                      disabled={loading}
-                      placeholder="Item description"
-                      {...field}
-                    />
+                    <Textarea placeholder="Item description" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -274,12 +266,7 @@ export const InventoryForm: React.FC<InventoryFormProps> = ({
                 <FormItem>
                   <FormLabel>Price</FormLabel>
                   <FormControl>
-                    <Input
-                      type="number"
-                      disabled={loading}
-                      placeholder="Item Price"
-                      {...field}
-                    />
+                    <Input type="number" placeholder="Item Price" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -292,7 +279,6 @@ export const InventoryForm: React.FC<InventoryFormProps> = ({
                 <FormItem>
                   <FormLabel>Category</FormLabel>
                   <Select
-                    disabled={loading}
                     onValueChange={field.onChange}
                     value={field.value}
                     defaultValue={field.value}
@@ -308,7 +294,7 @@ export const InventoryForm: React.FC<InventoryFormProps> = ({
                     <SelectContent>
                       {/* @ts-ignore  */}
                       {categories.map((category) => (
-                        <SelectItem key={category._id} value={category._id}>
+                        <SelectItem key={category.id} value={category.id}>
                           {category.name}
                         </SelectItem>
                       ))}
@@ -319,11 +305,11 @@ export const InventoryForm: React.FC<InventoryFormProps> = ({
               )}
             />
           </div>
-          <Button disabled={loading} className="ml-auto" type="submit">
+          <Button className="ml-auto" type="submit">
             {action}
           </Button>
           <Link href={`/admin/dashboard/inventory`}>
-            <Button disabled={loading} variant="outline" className="ml-2">
+            <Button variant="outline" className="ml-2">
               Cancel
             </Button>
           </Link>

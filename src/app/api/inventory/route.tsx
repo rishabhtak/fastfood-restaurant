@@ -127,14 +127,12 @@ export async function DELETE(req: NextRequest): Promise<NextResponse> {
     const idParam = searchParams.get("id");
     const id = idParam ? Number(idParam) : null;
 
-    // Ensure ID is valid
     if (!id || isNaN(id)) {
       return NextResponse.json({
         message: "Invalid ID",
         status: 400,
       });
     } else {
-      // Delete the inventory item
       const deletedInventory = await prisma.inventory.delete({
         where: { id },
       });

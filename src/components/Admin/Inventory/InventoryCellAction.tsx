@@ -1,4 +1,6 @@
 "use client";
+import { useRouter } from "next/navigation";
+import { useState, useContext } from "react";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -10,7 +12,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-
+import { useToast } from "@/components/ui/use-toast";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -21,20 +23,25 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { inventoryType } from "@/types/inventoryType";
 import { Edit, MoreHorizontal, Trash } from "lucide-react";
-import { useParams, useRouter } from "next/navigation";
-import { useState } from "react";
+import { Context } from "@/components/ContextProvider";
 
 interface CellActionProps {
   data: inventoryType;
 }
 
+interface isLoadingProps {
+  setIsLoading: React.Dispatch<React.SetStateAction<boolean>>;
+}
+
 export const InventoryCellAction: React.FC<CellActionProps> = ({ data }) => {
-  const [loading, setLoading] = useState<boolean>(false);
   const [open, setOpen] = useState<boolean>(false);
   const router = useRouter();
+  const { setIsLoading } = useContext(Context) as isLoadingProps;
+  const { toast } = useToast();
 
   const onConfirm = async () => {
     try {
+      setIsLoading(true);
       // Send both requests in parallel
       const [deleteInventoryResponse, deleteImageResponse] = await Promise.all([
         fetch(`/api/inventory/?id=${data?.id}`, { method: "DELETE" }),
@@ -47,22 +54,30 @@ export const InventoryCellAction: React.FC<CellActionProps> = ({ data }) => {
 
       // Handle inventory deletion response
       if (!deleteInventoryResponse.ok) {
-        throw new Error(deleteInventoryResponse.statusText);
+        throw new Error("Inventory deletion has failed");
       }
 
       // Handle image deletion response
       if (!deleteImageResponse.ok) {
-        throw new Error(
-          deleteImageResponse instanceof Response
-            ? deleteImageResponse.statusText
-            : "Error deleting image"
-        );
+        throw new Error("Inventory Deleted but Image deletion has failed");
       }
       router.refresh();
-      console.log("Successfully deleted inventory and image (if present)");
+      toast({
+        variant: "default",
+        duration: 2000,
+        title: "Inventory deleted successfully",
+      });
     } catch (error) {
-      console.error("Error during deletion:", error);
       router.refresh();
+      toast({
+        variant: "destructive",
+        duration: 4000,
+        title: "Uh oh! Something went wrong.",
+        description: `There is a problem with your request. Please try again later.
+        ${error}`,
+      });
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -74,8 +89,8 @@ export const InventoryCellAction: React.FC<CellActionProps> = ({ data }) => {
           <AlertDialogHeader>
             <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
             <AlertDialogDescription>
-              This action cannot be undone. This will permanently delete your
-              account and remove your data from our servers.
+              This action cannot be undone. This will permanently delete
+              inventory.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

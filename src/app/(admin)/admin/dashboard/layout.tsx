@@ -5,6 +5,7 @@ import { Inter } from "next/font/google";
 import "@/app/globals.css";
 import ContextProvider from "@/components/ContextProvider";
 import NextTopLoader from "nextjs-toploader";
+import { Toaster } from "@/components/ui/toaster";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -27,6 +28,7 @@ export default function DashboardLayout({
             <Sidebar />
             <main className="w-full flex-1 overflow-hidden">
               <Header />
+              <Toaster />
               {children}
             </main>
           </div>
@@ -35,4 +37,3 @@ export default function DashboardLayout({
     </html>
   );
 }
-

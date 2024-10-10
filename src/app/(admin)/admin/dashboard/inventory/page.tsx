@@ -39,7 +39,7 @@ export default async function page({ searchParams }: paramsProps) {
       }
     );
     if (!response.ok) {
-      throw new Error(`Error: ${response.status} ${response.statusText}`);
+      throw new Error("Failed to fetch inventory data");
     }
 
     const res = await response.json();
@@ -78,7 +78,7 @@ export default async function page({ searchParams }: paramsProps) {
       <PageContainer>
         <div className="space-y-4">
           <Heading title="Failed to load inventory data." />
-          <p>Please try again later.</p>
+          <p>Please try again later or Keep trying to reload browser</p>
         </div>
       </PageContainer>
     );
