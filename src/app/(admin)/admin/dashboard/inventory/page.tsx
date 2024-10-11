@@ -77,7 +77,7 @@ export default async function page({ searchParams }: paramsProps) {
       <PageContainer>
         <div className="space-y-4">
           <Heading title="Failed to load inventory data because of internal server error or bad request." />
-          <p>Please try again later or Keep trying to reload browser</p>
+          <p>{`Please try again later or Keep trying to reload browser ${error}`}</p>
         </div>
       </PageContainer>
     );
