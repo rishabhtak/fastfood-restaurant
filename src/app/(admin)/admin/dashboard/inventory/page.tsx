@@ -63,7 +63,7 @@ export default async function page({ searchParams }: paramsProps) {
           <Separator />
           <DataTable
             searchKey="Item Name"
-            //  pageNo={page}
+            pageNo={page}
             columns={inventoryColumns}
             //  totalInventory={totalInventory}
             data={inventory}

@@ -84,7 +84,7 @@ interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
   searchKey: string;
-  // pageNo: number;
+  pageNo: number;
   // totalInventory: number;
   pageSizeOptions?: number[];
   pageCount: number;
@@ -136,7 +136,7 @@ export function DataTable<TData, TValue>({
   columns,
   data,
   searchKey,
-  //pageNo,
+  pageNo,
   // totalInventory,
   pageCount,
   statusBox,
@@ -150,13 +150,14 @@ export function DataTable<TData, TValue>({
 
   const [sorting, setSorting] = useState<SortingState>([]);
   const [selectedStatuses, setSelectedStatuses] = useState<Status[]>([]);
-  // console.log('employee', data);
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
   // Search params
-  const page = searchParams?.get("page") ?? "1";
-  const pageAsNumber = Number(page);
+  // const page = searchParams?.get("page") ?? "1";
+
+  const pageAsNumber = pageNo;
+  console.log("page", pageNo);
   const fallbackPage =
     isNaN(pageAsNumber) || pageAsNumber < 1 ? 1 : pageAsNumber;
   const per_page = searchParams?.get("limit") ?? "10";
