@@ -75,7 +75,7 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
 
     return NextResponse.json({
       inventory: null,
-      message: "Invalid id parameter",
+      message: "Invalid parameter",
       status: 400,
     });
   } catch (error) {

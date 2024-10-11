@@ -38,19 +38,13 @@ export default async function page({ searchParams }: paramsProps) {
         },
       }
     );
-    console.log("ok", response.ok);
-
-    if (!response.ok) {
-      console.log("!ok", response.ok);
-
+    const data = await response.json();
+    if (data.status === "400" || data.status === "500") {
       throw new Error("Failed to fetch inventory data");
     }
-
-    const res = await response.json();
-    console.log("res", res);
-    const totalInventory = res.count;
+    const totalInventory = data.count;
     const pageCount = Math.ceil(totalInventory / pageLimit);
-    const inventory: inventoryType[] = res.inventories;
+    const inventory: inventoryType[] = data.inventories;
     return (
       <PageContainer>
         <div className="space-y-4">
@@ -82,7 +76,7 @@ export default async function page({ searchParams }: paramsProps) {
     return (
       <PageContainer>
         <div className="space-y-4">
-          <Heading title="Failed to load inventory data." />
+          <Heading title="Failed to load inventory data because of internal server error or bad request." />
           <p>Please try again later or Keep trying to reload browser</p>
         </div>
       </PageContainer>
