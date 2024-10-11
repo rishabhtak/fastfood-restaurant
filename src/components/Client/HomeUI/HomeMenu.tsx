@@ -9,27 +9,28 @@ const HomeMenu = () => {
   const [isMounted, setIsMounted] = useState<boolean>(false);
 
   // Create a function to generate the spring animation based on delay and ref
-  const createSpring = (delay: number) => {
-    const [ref, inView] = useInView({
+  const CreateSpring = (delay: number) => {
+    /*  const [ref, inView] = useInView({
       once: true,
       threshold: 0.1,
-    });
+    });*/
+    const [ref, inView] = useInView();
 
-    const springProps = useSpring({
+    const SpringProps = useSpring({
       transform: inView ? "translateY(0px)" : "translateY(100px)",
       opacity: inView ? 1 : 0,
       config: { tension: 100, friction: 22 },
       delay,
     });
 
-    return [ref, springProps] as const;
+    return [ref, SpringProps] as const;
   };
 
   // Define springs with different delays
-  const [ref1, oneSprings] = createSpring(0);
-  const [ref2, secondSprings] = createSpring(300);
-  const [ref3, thirdSprings] = createSpring(600);
-  const [ref4, fourthSprings] = createSpring(900);
+  const [ref1, oneSprings] = CreateSpring(0);
+  const [ref2, secondSprings] = CreateSpring(300);
+  const [ref3, thirdSprings] = CreateSpring(600);
+  const [ref4, fourthSprings] = CreateSpring(900);
 
   useEffect(() => {
     setIsMounted(true);

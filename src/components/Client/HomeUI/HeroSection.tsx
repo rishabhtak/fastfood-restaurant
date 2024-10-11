@@ -7,7 +7,7 @@ import { useEffect, useState } from "react";
 const HeroSection = () => {
   const [isMounted, setIsMounted] = useState<boolean>(false);
 
-  const createSpring = (delay: number) => {
+  const CreateSpring = (delay: number) => {
     return useSpring({
       from: { transform: "translateY(100px)", opacity: 0 },
       to: { transform: "translateY(0px)", opacity: 1 },
@@ -16,9 +16,9 @@ const HeroSection = () => {
     });
   };
 
-  const h1Springs = createSpring(0);
-  const pSprings = createSpring(300);
-  const linkSprings = createSpring(500);
+  const h1Springs = CreateSpring(0);
+  const pSprings = CreateSpring(300);
+  const linkSprings = CreateSpring(500);
 
   useEffect(() => {
     setIsMounted(true);

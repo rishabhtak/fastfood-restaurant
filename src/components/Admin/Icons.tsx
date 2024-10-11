@@ -8,6 +8,7 @@ import {
   User,
   User2Icon,
   UtensilsIcon,
+  ArrowRight,
 } from "lucide-react";
 
 export type Icon = LucideIcon;
@@ -20,6 +21,8 @@ export const Icons = {
   employee: UserX2Icon,
   user: User,
   inventory: UtensilsIcon,
+  arrowRight: ArrowRight,
+
 
   gitHub: ({ ...props }: LucideProps) => (
     <svg

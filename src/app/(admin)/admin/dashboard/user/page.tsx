@@ -56,7 +56,7 @@ export default async function page({ searchParams }: paramsProps) {
           searchKey="country"
           pageNo={page}
           columns={userColumns}
-          totalUsers={totalUsers}
+        //  totalUsers={totalUsers}
           data={user}
           pageCount={pageCount}
           statusBox={true}

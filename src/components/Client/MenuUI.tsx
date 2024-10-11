@@ -16,7 +16,7 @@ const MenuUI = () => {
     }),
     {
       once: true,
-      threshold: 0.5,
+      // threshold: 0.5,
     }
   );
 
@@ -26,7 +26,10 @@ const MenuUI = () => {
       to: { transform: "translateX(0px)", opacity: 1 },
       config: { tension: 100, friction: 22 },
     }),
-    { once: true, threshold: 0.6 }
+    {
+      once: true,
+      // threshold: 0.6
+    }
   );
 
   useEffect(() => {
