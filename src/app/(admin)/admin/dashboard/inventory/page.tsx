@@ -38,11 +38,16 @@ export default async function page({ searchParams }: paramsProps) {
         },
       }
     );
+    console.log("ok", response.ok);
+
     if (!response.ok) {
+      console.log("!ok", response.ok);
+
       throw new Error("Failed to fetch inventory data");
     }
 
     const res = await response.json();
+    console.log("res", res);
     const totalInventory = res.count;
     const pageCount = Math.ceil(totalInventory / pageLimit);
     const inventory: inventoryType[] = res.inventories;

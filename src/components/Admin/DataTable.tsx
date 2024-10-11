@@ -157,7 +157,6 @@ export function DataTable<TData, TValue>({
   // const page = searchParams?.get("page") ?? "1";
 
   const pageAsNumber = pageNo;
-  console.log("page", pageNo);
   const fallbackPage =
     isNaN(pageAsNumber) || pageAsNumber < 1 ? 1 : pageAsNumber;
   const per_page = searchParams?.get("limit") ?? "10";
