@@ -37,12 +37,12 @@ export const ImageUpload = ({
         {value?.url && (
           <div
             key={value?.url}
-            className="h-28 w-28 bg-white p-3 shadow-sm border border-gray-200 relative rounded-full"
+            className="h-28 w-28 bg-white p-2 shadow-sm border border-gray-200 relative rounded-md"
           >
             <Image
               src={value?.url}
-              alt=""
-              className="rounded-full w-full h-full"
+              alt="image upload"
+              className="rounded-md w-full h-full"
               width={120}
               height={120}
             />
@@ -51,12 +51,12 @@ export const ImageUpload = ({
               onClick={() => deleteImg()}
             >
               <svg
-                height="24px"
+                height="20px"
                 id="Layer_1"
                 enableBackground="new 0 0 512 512"
                 version="1.1"
                 viewBox="0 0 512 512"
-                width="24px"
+                width="20px"
                 xmlSpace="preserve"
                 xmlns="http://www.w3.org/2000/svg"
                 xmlnsXlink="http://www.w3.org/1999/xlink"
@@ -69,7 +69,7 @@ export const ImageUpload = ({
           </div>
         )}
         {!value?.url && (
-          <label className="h-28 w-28 cursor-pointer text-center flex flex-col items-center justify-center text-sm gap-1 text-primary bg-white shadow-sm border border-primary rounded-full">
+          <label className="h-28 w-28 cursor-pointer text-center flex flex-col items-center justify-center text-sm gap-1 text-primary bg-white shadow-sm border rounded-md">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               height="24px"

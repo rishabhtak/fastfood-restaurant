@@ -1,6 +1,5 @@
 import Breadcrumbs from "@/components/Breadcrumbs";
 import PageContainer from "@/components/Admin/PageContainer";
-import { inventoryColumns } from "@/components/Admin/Inventory/inventoryColumns";
 import { buttonVariants } from "@/components/ui/button";
 import { Heading } from "@/components/ui/heading";
 import { Separator } from "@/components/ui/separator";
@@ -8,11 +7,11 @@ import { inventoryType } from "@/types/inventoryType";
 import { cn } from "@/lib/utils";
 import { Plus } from "lucide-react";
 import Link from "next/link";
-import { DataTable } from "@/components/Admin/DataTable";
+import { Inventory } from "@/components/Admin/Inventory/Inventory";
 
 const breadcrumbItems = [
-  { title: "Dashboard", link: "/dashboard" },
-  { title: "Inventory", link: "/dashboard/inventory" },
+  { title: "Dashboard", link: "/admin/dashboard" },
+  { title: "Inventory", link: "/admin/dashboard/inventory" },
 ];
 
 type paramsProps = {
@@ -45,30 +44,30 @@ export default async function page({ searchParams }: paramsProps) {
     const totalInventory = data.count;
     const pageCount = Math.ceil(totalInventory / pageLimit);
     const inventory: inventoryType[] = data.inventories;
+
     return (
       <PageContainer>
         <div className="space-y-4">
           <Breadcrumbs items={breadcrumbItems} />
           <div className="flex items-start justify-between">
             <Heading title={`Inventory (${totalInventory})`} />
-
-            <Link
-              href={"/admin/dashboard/inventory/new"}
-              className={cn(buttonVariants({ variant: "default" }))}
-            >
-              <Plus className="mr-2 h-4 w-4" /> Add New
-            </Link>
+            <div className="flex justify-end gap-3">
+              <Link
+                href={"/admin/dashboard/inventory/category"}
+                className={cn(buttonVariants({ variant: "default" }))}
+              >
+                <Plus className="mr-2 h-4 w-4" /> Add Category
+              </Link>
+              <Link
+                href={"/admin/dashboard/inventory/new"}
+                className={cn(buttonVariants({ variant: "default" }))}
+              >
+                <Plus className="mr-2 h-4 w-4" /> Add Item
+              </Link>
+            </div>
           </div>
           <Separator />
-          <DataTable
-            searchKey="Item Name"
-            pageNo={page}
-            columns={inventoryColumns}
-            //  totalInventory={totalInventory}
-            data={inventory}
-            pageCount={pageCount}
-            statusBox={false}
-          />
+          <Inventory inventory={inventory} pageCount={pageCount} page={page} />
         </div>
       </PageContainer>
     );

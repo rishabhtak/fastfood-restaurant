@@ -1,6 +1,6 @@
 "use client";
 import * as z from "zod";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { useRouter } from "next/navigation";
@@ -28,6 +28,7 @@ import {
 } from "@/components/ui/select";
 import { useToast } from "@/components/ui/use-toast";
 import { inventoryType } from "@/types/inventoryType";
+import { categoryType } from "@/types/categoryType";
 
 const ImgSchema = z.object({
   url: z.string({
@@ -55,24 +56,36 @@ interface InventoryFormProps {
   initialData: inventoryType | null;
 }
 
-interface Categories {
-  id: string;
-  name: string;
-}
-
-const categories: Categories[] = [
-  { id: "shirts", name: "shirts" },
-  { id: "pants", name: "pants" },
-];
-
 export const InventoryForm: React.FC<InventoryFormProps> = ({
   initialData,
 }) => {
   const router = useRouter();
   const { toast } = useToast();
   const [loading, setLoading] = useState<boolean>(false);
+  const [categories, setCategories] = useState<categoryType[]>([]);
   const title = initialData ? "Edit product" : "Create product";
   const action = initialData ? "Save changes" : "Create";
+
+  const fetchCategories = async (): Promise<void> => {
+    try {
+      const response = await fetch("/api/category");
+      const data = await response.json();
+      if (data.status === 500) {
+        throw new Error(data.message);
+      }
+      setCategories(data.categories);
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        duration: 4000,
+        title: "Uh oh! Something went wrong.",
+        description: `${error}`,
+      });
+    }
+  };
+  useEffect(() => {
+    fetchCategories();
+  }, []);
 
   const defaultValues = initialData
     ? initialData
@@ -120,7 +133,7 @@ export const InventoryForm: React.FC<InventoryFormProps> = ({
         // Upload the image to Cloudinary
         const formData = new FormData();
         formData.append("file", imageData?.file); // New image to upload
-        formData.append("upload_preset", "uploadimage_cloudinary");
+        formData.append("upload_preset", "fastfood_testing");
 
         const response = await fetch(`/api/uploadImage`, {
           method: "POST",
@@ -158,7 +171,8 @@ export const InventoryForm: React.FC<InventoryFormProps> = ({
             inventoryData,
           }),
         });
-        if (!res.ok) {
+        const data = await res.json();
+        if (data.status === "400" || data.status === "500") {
           throw new Error(res.statusText);
         }
       } else {
@@ -170,15 +184,14 @@ export const InventoryForm: React.FC<InventoryFormProps> = ({
           },
           body: JSON.stringify(inventoryData),
         });
-
-        if (!res.ok) {
+        const data = await res.json();
+        if (data.status === "400" || data.status === "500") {
           throw new Error(res.statusText);
         }
       }
 
       router.push(`/admin/dashboard/inventory`);
       router.refresh();
-
       toast({
         variant: "default",
         duration: 2000,
@@ -308,8 +321,8 @@ export const InventoryForm: React.FC<InventoryFormProps> = ({
                     <SelectContent>
                       {/* @ts-ignore  */}
                       {categories.map((category) => (
-                        <SelectItem key={category.id} value={category.id}>
-                          {category.name}
+                        <SelectItem key={category.id} value={category.name}>
+                          <span className="capitalize">{category.name}</span>
                         </SelectItem>
                       ))}
                     </SelectContent>

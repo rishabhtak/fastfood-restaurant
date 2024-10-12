@@ -12,9 +12,19 @@ import {
   getSortedRowModel,
 } from "@tanstack/react-table";
 import { useState, useEffect, useCallback, useContext } from "react";
-import { cn } from "@/lib/utils";
-
+import { Trash } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import {
@@ -88,6 +98,7 @@ interface DataTableProps<TData, TValue> {
   // totalInventory: number;
   pageSizeOptions?: number[];
   pageCount: number;
+  onDelete?: (selectedRows: TData[]) => Promise<void>;
   searchParams?: {
     [key: string]: string | string[] | undefined;
   };
@@ -137,12 +148,14 @@ export function DataTable<TData, TValue>({
   data,
   searchKey,
   pageNo,
+  onDelete,
   // totalInventory,
   pageCount,
   statusBox,
   pageSizeOptions = [10, 20, 30, 40, 50],
 }: DataTableProps<TData, TValue>) {
   const [open, setOpen] = useState<boolean>(false);
+  const [alertOpen, setAlertOpen] = useState<boolean>(false);
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [debouncedSearchTerm, setDebouncedSearchTerm] =
     useState<string>(searchTerm);
@@ -162,9 +175,6 @@ export function DataTable<TData, TValue>({
   const per_page = searchParams?.get("limit") ?? "10";
   const perPageAsNumber = Number(per_page);
   const fallbackPerPage = isNaN(perPageAsNumber) ? 10 : perPageAsNumber;
-
-  /* this can be used to get the selectedrows 
-  console.log("value", table.getFilteredSelectedRowModel()); */
 
   const { isLoading } = useContext(Context) as isLoadingProps;
 
@@ -237,6 +247,18 @@ export function DataTable<TData, TValue>({
     manualFiltering: true,
   });
 
+  // this can be used to get the selectedrows
+  const seletedRowData: TData[] = table
+    .getSelectedRowModel()
+    ?.rows.map((row) => row.original);
+
+  const onConfirm = async (): Promise<void> => {
+    setAlertOpen(false);
+    if (onDelete && seletedRowData.length > 0) {
+      await onDelete(seletedRowData); // Call the onDelete prop with the selected row data
+    }
+  };
+
   // Effect to trigger the search when the debounced search term changes
   useEffect(() => {
     if (debouncedSearchTerm !== "") {
@@ -262,7 +284,7 @@ export function DataTable<TData, TValue>({
   }, [debouncedSearchTerm]);
 
   // Toggle selection of a status
-  const handleSelect = (status: Status) => {
+  const handleSelect = (status: Status): void => {
     setSelectedStatuses((prev) =>
       prev.find((s) => s.value === status.value)
         ? prev.filter((s) => s.value !== status.value)
@@ -271,10 +293,26 @@ export function DataTable<TData, TValue>({
   };
 
   // Clear all selected statuses
-  const clearFilter = () => setSelectedStatuses([]);
+  const clearFilter = (): void => setSelectedStatuses([]);
 
   return (
     <>
+      <AlertDialog open={alertOpen} onOpenChange={setAlertOpen}>
+        <AlertDialogTrigger />
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This action cannot be undone. This will permanently delete
+              selected inventory.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={onConfirm}>Continue</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
       {isLoading ? (
         <div className="flex justify-center items-center h-64">
           <span className="loader"></span>
@@ -389,6 +427,15 @@ export function DataTable<TData, TValue>({
                   })}
               </DropdownMenuContent>
             </DropdownMenu>
+            {seletedRowData.length > 0 && (
+              <Button
+                onClick={() => setAlertOpen(true)}
+                variant="outline"
+                className="ml-2"
+              >
+                <Trash className="mr-2 h-4 w-4" /> Delete Selected
+              </Button>
+            )}
           </div>
 
           <ScrollArea className="h-[calc(80vh-220px)] rounded-md border">

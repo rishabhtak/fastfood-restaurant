@@ -40,7 +40,7 @@ export async function DELETE(req: NextRequest): Promise<NextResponse> {
       return NextResponse.json({ success: false, message: "No URL found" });
     }
 
-    const regex = /\/uploadimage_folder\/([^/]+)\.webp$/;
+    const regex = /\/fastfood_upload\/([^/]+)\.webp$/;
     const publicId = url.match(regex);
 
     if (!publicId || publicId.length < 2) {
@@ -52,13 +52,13 @@ export async function DELETE(req: NextRequest): Promise<NextResponse> {
 
     const timestamp = Math.floor(Date.now() / 1000); // Cloudinary expects seconds, not milliseconds
     const stringToSign = `public_id=${
-      "uploadimage_folder/" + publicId[1]
+      "fastfood_upload/" + publicId[1]
     }&timestamp=${timestamp}${process.env.CLOUDINARY_API_SECRET}`;
 
     const signature = sha1(stringToSign);
 
     const formData = new FormData();
-    formData.append("public_id", "uploadimage_folder/" + publicId[1]);
+    formData.append("public_id", "fastfood_upload/" + publicId[1]);
     formData.append("signature", signature);
     formData.append("api_key", process.env.CLOUDINARY_API_KEY || "");
     formData.append("timestamp", timestamp.toString());
