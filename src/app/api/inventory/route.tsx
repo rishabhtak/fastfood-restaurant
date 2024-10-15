@@ -4,13 +4,29 @@ import { inventoryType } from "@/types/inventoryType";
 
 export async function POST(req: NextRequest): Promise<NextResponse> {
   try {
-    const { name, description, price, image, category }: inventoryType =
-      await req.json();
+    const {
+      name,
+      description,
+      image,
+      category,
+      vegNonVeg,
+      inStock,
+      variants,
+      addons,
+    }: inventoryType = await req.json();
 
     const inventoryData = await prisma.inventory.create({
-      data: { name, description, price, image, category },
+      data: {
+        name,
+        description,
+        image,
+        category,
+        vegNonVeg,
+        inStock,
+        variants: variants.map((variant) => ({ ...variant })),
+        addons: addons.map((addon) => ({ ...addon })),
+      },
     });
-
     return NextResponse.json({
       inventoryData,
       message: "Success",
@@ -90,8 +106,16 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
 export async function PUT(req: NextRequest): Promise<NextResponse> {
   try {
     const body = await req.json();
-    const { name, description, price, image, category }: inventoryType =
-      body.inventoryData;
+    const {
+      name,
+      description,
+      image,
+      category,
+      inStock,
+      variants,
+      addons,
+      vegNonVeg,
+    }: inventoryType = body.inventoryData;
     const id = body.id;
 
     // Ensure ID is valid
@@ -105,7 +129,16 @@ export async function PUT(req: NextRequest): Promise<NextResponse> {
     // Update the inventory item
     const updatedInventory = await prisma.inventory.update({
       where: { id },
-      data: { name, description, price, image, category },
+      data: {
+        name,
+        description,
+        image,
+        category,
+        inStock,
+        variants: variants.map((variant) => ({ ...variant })),
+        addons: addons.map((addon) => ({ ...addon })),
+        vegNonVeg,
+      },
     });
 
     return NextResponse.json({

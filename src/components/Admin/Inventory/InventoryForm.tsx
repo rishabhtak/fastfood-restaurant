@@ -7,6 +7,9 @@ import { useRouter } from "next/navigation";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
+import { RadioGroup } from "@/components/ui/radio-group";
+import { Switch } from "@/components/ui/switch";
+
 import ImageUpload from "@/components/ImageUpload";
 import Link from "next/link";
 import {
@@ -29,6 +32,7 @@ import {
 import { useToast } from "@/components/ui/use-toast";
 import { inventoryType } from "@/types/inventoryType";
 import { categoryType } from "@/types/categoryType";
+import Variants from "./Variants";
 
 const ImgSchema = z.object({
   url: z.string({
@@ -41,13 +45,32 @@ const ImgSchema = z.object({
 const formSchema = z.object({
   name: z
     .string()
-    .min(3, { message: "Item Name must be at least 3 characters" }),
+    .min(3, { message: "Item Name must be at least 3 characters" })
+    .max(70, { message: "Item Name must be at max 50 characters" }),
   image: ImgSchema,
   description: z
     .string()
-    .min(3, { message: "Item description must be at least 3 characters" }),
-  price: z.coerce.number().min(1, { message: "Please enter a vaild price" }),
+    .min(3, { message: "Item description must be at least 3 characters" })
+    .max(500, { message: "Item Description must be at max 250 characters" }),
   category: z.string().min(1, { message: "Please select a category" }),
+  vegNonVeg: z.string().min(1, { message: "Please select Veg or NonVeg" }),
+  inStock: z.boolean().default(true),
+  variants: z
+    .array(
+      z.object({
+        name: z.string(),
+        price: z.coerce.number(),
+      })
+    )
+    .min(1, { message: "At least one variant is required" }),
+  addons: z
+    .array(
+      z.object({
+        name: z.string(),
+        price: z.coerce.number(),
+      })
+    )
+    .optional(),
 });
 
 type InventoryFormValues = z.infer<typeof formSchema>;
@@ -55,6 +78,15 @@ type InventoryFormValues = z.infer<typeof formSchema>;
 interface InventoryFormProps {
   initialData: inventoryType | null;
 }
+interface VegNonVeg {
+  id: string;
+  name: string;
+}
+
+const vegNonVeg: VegNonVeg[] = [
+  { id: "veg", name: "Veg" },
+  { id: "nonveg", name: "NonVeg" },
+];
 
 export const InventoryForm: React.FC<InventoryFormProps> = ({
   initialData,
@@ -63,6 +95,7 @@ export const InventoryForm: React.FC<InventoryFormProps> = ({
   const { toast } = useToast();
   const [loading, setLoading] = useState<boolean>(false);
   const [categories, setCategories] = useState<categoryType[]>([]);
+
   const title = initialData ? "Edit product" : "Create product";
   const action = initialData ? "Save changes" : "Create";
 
@@ -92,15 +125,19 @@ export const InventoryForm: React.FC<InventoryFormProps> = ({
     : {
         name: "",
         description: "",
-        price: 0,
         image: {},
         category: "",
+        vegNonVeg: "Veg",
+        variants: [],
+        addons: [],
+        inStock: true,
       };
 
   const {
     formState: { errors },
     control,
     handleSubmit,
+    watch,
   } = useForm<InventoryFormValues>({
     resolver: zodResolver(formSchema),
     defaultValues,
@@ -234,13 +271,61 @@ export const InventoryForm: React.FC<InventoryFormProps> = ({
         })}
       >
         <form onSubmit={handleSubmit(onSubmit)} className="w-full space-y-8">
-          <div className="gap-8 md:grid md:grid-cols-3">
+          <div className="gap-8 md:grid md:grid-cols-2 mb-10">
+            <FormField
+              control={control}
+              name="name"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Name *</FormLabel>
+                  <FormControl>
+                    <div className="relative">
+                      <Input
+                        placeholder="Item name"
+                        maxLength={70}
+                        {...field}
+                      />
+                      <span className="absolute -bottom-6 right-0 text-sm text-gray-500">
+                        {watch("name").length}/70
+                      </span>
+                    </div>
+                  </FormControl>
+                  <FormMessage>
+                    {errors && <span>{errors?.name?.message}</span>}
+                  </FormMessage>
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={control}
+              name="description"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Description *</FormLabel>
+                  <FormControl>
+                    <div className="relative">
+                      <Textarea
+                        placeholder="Item description"
+                        maxLength={500}
+                        {...field}
+                      />
+                      <span className="absolute -bottom-6 right-0 text-sm text-gray-500">
+                        {watch("description").length}/500
+                      </span>
+                    </div>
+                  </FormControl>
+                  <FormMessage>
+                    {errors && <span>{errors?.description?.message}</span>}
+                  </FormMessage>
+                </FormItem>
+              )}
+            />
             <FormField
               control={control}
               name="image"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Image</FormLabel>
+                  <FormLabel>Image *</FormLabel>
                   <FormControl>
                     <ImageUpload
                       onChange={field.onChange}
@@ -256,55 +341,10 @@ export const InventoryForm: React.FC<InventoryFormProps> = ({
             />
             <FormField
               control={control}
-              name="name"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Name</FormLabel>
-                  <FormControl>
-                    <Input placeholder="Item name" {...field} />
-                  </FormControl>
-                  <FormMessage>
-                    {errors && <span>{errors?.name?.message}</span>}
-                  </FormMessage>
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={control}
-              name="description"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Description</FormLabel>
-                  <FormControl>
-                    <Textarea placeholder="Item description" {...field} />
-                  </FormControl>
-                  <FormMessage>
-                    {errors && <span>{errors?.description?.message}</span>}
-                  </FormMessage>
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={control}
-              name="price"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Price</FormLabel>
-                  <FormControl>
-                    <Input type="number" placeholder="Item Price" {...field} />
-                  </FormControl>
-                  <FormMessage>
-                    {errors && <span>{errors?.price?.message}</span>}
-                  </FormMessage>
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={control}
               name="category"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Category</FormLabel>
+                  <FormLabel>Category *</FormLabel>
                   <Select
                     onValueChange={field.onChange}
                     value={field.value}
@@ -329,6 +369,109 @@ export const InventoryForm: React.FC<InventoryFormProps> = ({
                   </Select>
                   <FormMessage>
                     {errors && <span>{errors?.category?.message}</span>}
+                  </FormMessage>
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={control}
+              name="variants"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Variants *</FormLabel>
+                  <FormControl>
+                    <Variants
+                      placeholder="Small or Normal or Half"
+                      value={field.value}
+                      onChangeVariant={field.onChange}
+                      onRemoveVariant={field.onChange}
+                    />
+                  </FormControl>
+                  <FormMessage>
+                    {errors && <span>{errors?.variants?.message}</span>}
+                  </FormMessage>
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={control}
+              name="addons"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Addons (Optional)</FormLabel>
+                  <FormControl>
+                    <Variants
+                      placeholder="eg. Cheese Slice"
+                      value={field.value || []}
+                      onChangeVariant={field.onChange}
+                      onRemoveVariant={field.onChange}
+                    />
+                  </FormControl>
+                  <FormMessage>
+                    {errors && <span>{errors?.addons?.message}</span>}
+                  </FormMessage>
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={control}
+              name="inStock"
+              render={({ field }) => (
+                <FormItem>
+                  <FormControl>
+                    <div className="flex items-center space-x-2 mt-10">
+                      <Switch
+                        id="instock"
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                      />
+                      <label htmlFor="instock">In stock</label>
+                    </div>
+                  </FormControl>
+                  <FormMessage>
+                    {errors.inStock && <span>{errors.inStock.message}</span>}
+                  </FormMessage>
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={control}
+              name="vegNonVeg"
+              render={({ field }) => (
+                <FormItem>
+                  <FormControl>
+                    <RadioGroup
+                      className="flex justify-start mt-10"
+                      value={field.value}
+                      onValueChange={field.onChange}
+                    >
+                      {vegNonVeg.map((elem) => (
+                        <label key={elem.id} className="relative">
+                          <input
+                            type="radio"
+                            name="vegNonVeg"
+                            value={elem.name}
+                            className="absolute opacity-0"
+                            onChange={() => field.onChange(elem.name)}
+                            checked={field.value === elem.name}
+                          />
+                          <span
+                            className={`${
+                              field.value === elem.name
+                                ? "bg-blue-200 text-blue-700 rounded-lg"
+                                : "bg-white text-gray-700 rounded-lg"
+                            } px-6 py-2 border border-gray-300 cursor-pointer transition`}
+                          >
+                            {elem.name}
+                          </span>
+                        </label>
+                      ))}
+                    </RadioGroup>
+                  </FormControl>
+                  <FormMessage>
+                    {errors.vegNonVeg && (
+                      <span>{errors.vegNonVeg.message}</span>
+                    )}
                   </FormMessage>
                 </FormItem>
               )}

@@ -1,6 +1,5 @@
 "use client";
 import Image from "next/image";
-import { useState } from "react";
 
 interface ImageUploadProps {
   onChange?: (value: any) => void; // onChange method passed from InventoryForm

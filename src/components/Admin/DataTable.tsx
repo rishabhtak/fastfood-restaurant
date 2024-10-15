@@ -294,6 +294,14 @@ export function DataTable<TData, TValue>({
 
   // Clear all selected statuses
   const clearFilter = (): void => setSelectedStatuses([]);
+  let demo = table.getHeaderGroups().map((headerGroup) =>
+    headerGroup.headers.map((header) => {
+      if (header.column) {
+        return header.column.getCanSort();
+      }
+    })
+  );
+  console.log(demo.map((item) => typeof item));
 
   return (
     <>
@@ -464,34 +472,42 @@ export function DataTable<TData, TValue>({
                                         header.getContext()
                                       )}
                                     </span>
+
                                     {header.column.getIsSorted() === "desc" ? (
                                       <ArrowDownIcon className="ml-2 h-4 w-4" />
                                     ) : header.column.getIsSorted() ===
                                       "asc" ? (
                                       <ArrowUpIcon className="ml-2 h-4 w-4" />
-                                    ) : (
+                                    ) : header.column.getCanSort() === true ? (
                                       <ArrowUpDownIcon className="ml-2 h-4 w-4" />
+                                    ) : (
+                                      <EyeOffIcon className="ml-2 h-3.5 w-3.5 text-muted-foreground/70" />
                                     )}
                                   </Button>
                                 </DropdownMenuTrigger>
                                 <DropdownMenuContent align="start">
-                                  <DropdownMenuItem
-                                    onClick={() =>
-                                      header.column.toggleSorting(false)
-                                    }
-                                  >
-                                    <ArrowUpIcon className="mr-2 h-3.5 w-3.5 text-muted-foreground/70" />
-                                    Asc
-                                  </DropdownMenuItem>
-                                  <DropdownMenuItem
-                                    onClick={() =>
-                                      header.column.toggleSorting(true)
-                                    }
-                                  >
-                                    <ArrowDownIcon className="mr-2 h-3.5 w-3.5 text-muted-foreground/70" />
-                                    Desc
-                                  </DropdownMenuItem>
-                                  <DropdownMenuSeparator />
+                                  {header.column.getCanSort() === true && (
+                                    <>
+                                      <DropdownMenuItem
+                                        onClick={() =>
+                                          header.column.toggleSorting(false)
+                                        }
+                                      >
+                                        <ArrowUpIcon className="mr-2 h-3.5 w-3.5 text-muted-foreground/70" />
+                                        Asc
+                                      </DropdownMenuItem>
+                                      <DropdownMenuItem
+                                        onClick={() =>
+                                          header.column.toggleSorting(true)
+                                        }
+                                      >
+                                        <ArrowDownIcon className="mr-2 h-3.5 w-3.5 text-muted-foreground/70" />
+                                        Desc
+                                      </DropdownMenuItem>
+                                      <DropdownMenuSeparator />
+                                    </>
+                                  )}
+
                                   <DropdownMenuItem
                                     onClick={() =>
                                       header.column.toggleVisibility(false)
