@@ -38,7 +38,6 @@ export async function POST(req: NextRequest) {
 export async function GET() {
   try {
     const categories = await prisma.category.findMany();
-
     return NextResponse.json({
       categories,
       message: "Success",

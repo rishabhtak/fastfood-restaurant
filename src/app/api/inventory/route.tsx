@@ -40,17 +40,14 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
 export async function GET(req: NextRequest): Promise<NextResponse> {
   try {
     const { searchParams } = new URL(req.url);
+    const id = Number(searchParams.get("id")) || null;
+    const offset = Number(searchParams.get("offset")) || 0;
+    const limit = Number(searchParams.get("limit")) || null;
+    const itemName = searchParams.get("search") || "";
 
-    const idParam = searchParams.get("id");
-    const offset = Number(searchParams.get("offset"));
-    const limit = Number(searchParams.get("limit"));
-    const id = idParam ? Number(idParam) : null;
-    const itemName = searchParams.get("search");
-
-    if (id && !isNaN(id) && id > 0) {
-      const inventory = await prisma.inventory.findUnique({
-        where: { id },
-      });
+    // Fetch single inventory item by id
+    if (id) {
+      const inventory = await prisma.inventory.findUnique({ where: { id } });
 
       if (!inventory) {
         return NextResponse.json({
@@ -61,24 +58,17 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
       }
 
       return NextResponse.json({ inventory, message: "Success", status: 200 });
-    } else if (!idParam) {
+    }
+
+    // Fetch multiple inventory items with pagination and search
+    if (limit) {
       const [inventories, count] = await Promise.all([
         prisma.inventory.findMany({
           skip: offset,
           take: limit,
-          where: {
-            name: {
-              contains: itemName ?? "",
-            },
-          },
+          where: { name: { contains: itemName } },
         }),
-        prisma.inventory.count({
-          where: {
-            name: {
-              contains: itemName ?? "",
-            },
-          },
-        }),
+        prisma.inventory.count({ where: { name: { contains: itemName } } }),
       ]);
 
       return NextResponse.json({
@@ -89,11 +79,13 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
       });
     }
 
-    return NextResponse.json({
-      inventory: null,
-      message: "Invalid parameter",
-      status: 400,
+    // Fetch all items' inStock data if no id, offset, or limit is provided
+    const inStockData = await prisma.inventory.findMany({
+      select: { id: true, inStock: true, name: true, category: true },
+      orderBy: { name: "asc" },
     });
+
+    return NextResponse.json({ inStockData, message: "Success", status: 200 });
   } catch (error) {
     return NextResponse.json({
       inventory: null,
@@ -106,18 +98,7 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
 export async function PUT(req: NextRequest): Promise<NextResponse> {
   try {
     const body = await req.json();
-    const {
-      name,
-      description,
-      image,
-      category,
-      inStock,
-      variants,
-      addons,
-      vegNonVeg,
-    }: inventoryType = body.inventoryData;
     const id = body.id;
-
     // Ensure ID is valid
     if (!id || isNaN(id)) {
       return NextResponse.json({
@@ -125,27 +106,57 @@ export async function PUT(req: NextRequest): Promise<NextResponse> {
         status: 400,
       });
     }
-
-    // Update the inventory item
-    const updatedInventory = await prisma.inventory.update({
-      where: { id },
-      data: {
+    if (body.inventoryData) {
+      const {
         name,
         description,
         image,
         category,
         inStock,
-        variants: variants.map((variant) => ({ ...variant })),
-        addons: addons.map((addon) => ({ ...addon })),
+        variants,
+        addons,
         vegNonVeg,
-      },
-    });
+      }: inventoryType = body.inventoryData;
 
-    return NextResponse.json({
-      updatedInventory,
-      message: "Inventory updated successfully",
-      status: 200,
-    });
+      // Update the inventory item
+      await prisma.inventory.update({
+        where: { id },
+        data: {
+          name,
+          description,
+          image,
+          category,
+          inStock,
+          variants: variants.map((variant) => ({ ...variant })),
+          addons: addons.map((addon) => ({ ...addon })),
+          vegNonVeg,
+        },
+      });
+
+      return NextResponse.json({
+        message: "Inventory updated successfully",
+        status: 200,
+      });
+    } else if (typeof body.inStock === "boolean") {
+      // Update the inStock status
+      await prisma.inventory.update({
+        where: { id },
+        data: {
+          inStock: body.inStock,
+        },
+      });
+
+      return NextResponse.json({
+        message: "Inventory InStock updated successfully",
+        status: 200,
+      });
+    } else {
+      return NextResponse.json({
+        inventory: null,
+        message: "Invalid parameter",
+        status: 400,
+      });
+    }
   } catch (error) {
     return NextResponse.json({
       message: "Error updating inventory",

@@ -294,14 +294,6 @@ export function DataTable<TData, TValue>({
 
   // Clear all selected statuses
   const clearFilter = (): void => setSelectedStatuses([]);
-  let demo = table.getHeaderGroups().map((headerGroup) =>
-    headerGroup.headers.map((header) => {
-      if (header.column) {
-        return header.column.getCanSort();
-      }
-    })
-  );
-  console.log(demo.map((item) => typeof item));
 
   return (
     <>

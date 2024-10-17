@@ -64,6 +64,12 @@ export default async function page({ searchParams }: paramsProps) {
               >
                 <Plus className="mr-2 h-4 w-4" /> Add Item
               </Link>
+              <Link
+                href={"/admin/dashboard/inventory/updateinstock"}
+                className={cn(buttonVariants({ variant: "default" }))}
+              >
+                <Plus className="mr-2 h-4 w-4" /> Update InStock
+              </Link>
             </div>
           </div>
           <Separator />
