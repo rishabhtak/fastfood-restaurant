@@ -38,7 +38,6 @@ const UpdateInStock = ({
         item.id === id ? { ...item, inStock: inStock } : item
       )
     );
-    console.log("Updated Item ID:", id, "New In Stock Status:", inStock);
     // Update Inventory InStock
     try {
       const res = await fetch(`/api/inventory`, {
@@ -103,6 +102,7 @@ const UpdateInStock = ({
                         onCheckedChange(item.id, !item.inStock)
                       }
                     />
+                    <span>{item.inStock ? "In Stock" : "Out of Stock"}</span>
                   </div>
                 </div>
               ))}

@@ -425,7 +425,9 @@ export const InventoryForm: React.FC<InventoryFormProps> = ({
                         checked={field.value}
                         onCheckedChange={field.onChange}
                       />
-                      <label htmlFor="instock">In stock</label>
+                      <label htmlFor="instock">
+                        {field.value ? "In Stock" : "Out of Stock"}
+                      </label>
                     </div>
                   </FormControl>
                   <FormMessage>

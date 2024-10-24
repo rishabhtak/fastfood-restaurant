@@ -29,6 +29,7 @@ export const inventoryColumns: ColumnDef<inventoryType>[] = [
     header: "Item Name",
     id: "Item Name",
     enableHiding: false,
+    cell: ({ row }) => <div className="capitalize">{row.original.name}</div>,
   },
   {
     accessorKey: "description",
@@ -44,6 +45,9 @@ export const inventoryColumns: ColumnDef<inventoryType>[] = [
   {
     accessorKey: "category",
     header: "Item Category",
+    cell: ({ row }) => (
+      <div className="capitalize">{row.original.category}</div>
+    ),
   },
   {
     id: "actions",

@@ -31,12 +31,14 @@ interface CellActionProps {
 
 interface isLoadingProps {
   setIsLoading: React.Dispatch<React.SetStateAction<boolean>>;
+  deleteInventory: (id: number) => void;
 }
 
 export const InventoryCellAction: React.FC<CellActionProps> = ({ data }) => {
   const [open, setOpen] = useState<boolean>(false);
   const router = useRouter();
-  const { setIsLoading } = useContext(Context) as isLoadingProps;
+  const { setIsLoading, deleteInventory } =
+    useContext(Context) as isLoadingProps;
   const { toast } = useToast();
 
   const onConfirm = async () => {
@@ -61,6 +63,7 @@ export const InventoryCellAction: React.FC<CellActionProps> = ({ data }) => {
       if (!deleteImageResponse.ok) {
         throw new Error("Inventory Deleted but Image deletion has failed");
       }
+      deleteInventory(data.id);
       router.refresh();
       toast({
         variant: "default",

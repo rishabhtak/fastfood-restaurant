@@ -1,23 +1,46 @@
 "use client";
-import { useContext } from "react";
+import { useContext, useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { inventoryColumns } from "@/components/Admin/Inventory/inventoryColumns";
 import { inventoryType } from "@/types/inventoryType";
 import { DataTable } from "@/components/Admin/DataTable";
 import { useToast } from "@/components/ui/use-toast";
 import { Context } from "@/components/ContextProvider";
+import Breadcrumbs from "@/components/Breadcrumbs";
+import PageContainer from "@/components/Admin/PageContainer";
+import { buttonVariants } from "@/components/ui/button";
+import { Heading } from "@/components/ui/heading";
+import { Separator } from "@/components/ui/separator";
+import { cn } from "@/lib/utils";
+import { Plus } from "lucide-react";
+import Link from "next/link";
 
 interface InventoryProps {
   page: number;
   pageCount: number;
   inventory: inventoryType[];
+  breadcrumbItems: { title: string; link: string }[];
 }
 interface isLoadingProps {
   isLoading: boolean;
   setIsLoading: React.Dispatch<React.SetStateAction<boolean>>;
+  inventories: inventoryType[];
+  setInventories: React.Dispatch<React.SetStateAction<inventoryType[]>>;
+  deleteInventory: (id: number) => void;
 }
-export const Inventory = ({ page, pageCount, inventory }: InventoryProps) => {
-  const { isLoading, setIsLoading } = useContext(Context) as isLoadingProps;
+export const Inventory = ({
+  page,
+  pageCount,
+  inventory,
+  breadcrumbItems,
+}: InventoryProps) => {
+  const {
+    isLoading,
+    setIsLoading,
+    inventories,
+    setInventories,
+    deleteInventory,
+  } = useContext(Context) as isLoadingProps;
   const { toast } = useToast();
   const router = useRouter();
 
@@ -67,24 +90,56 @@ export const Inventory = ({ page, pageCount, inventory }: InventoryProps) => {
     }
   };
 
+  useEffect(() => {
+    setInventories(inventory);
+  }, [inventory, setInventories]);
+
   return (
     <>
-      {isLoading ? (
-        <div className="flex justify-center items-center h-64">
-          <span className="loader"></span>
+      <PageContainer>
+        <div className="space-y-4">
+          <Breadcrumbs items={breadcrumbItems} />
+          <div className="flex items-start justify-between">
+            <Heading title={`Inventory (${inventories?.length})`} />
+            <div className="flex justify-end gap-3">
+              <Link
+                href={"/admin/dashboard/inventory/category"}
+                className={cn(buttonVariants({ variant: "default" }))}
+              >
+                <Plus className="mr-2 h-4 w-4" /> Add Category
+              </Link>
+              <Link
+                href={"/admin/dashboard/inventory/new"}
+                className={cn(buttonVariants({ variant: "default" }))}
+              >
+                <Plus className="mr-2 h-4 w-4" /> Add Item
+              </Link>
+              <Link
+                href={"/admin/dashboard/inventory/updateinstock"}
+                className={cn(buttonVariants({ variant: "default" }))}
+              >
+                <Plus className="mr-2 h-4 w-4" /> Update InStock
+              </Link>
+            </div>
+          </div>
+          <Separator />
+          {isLoading ? (
+            <div className="flex justify-center items-center h-64">
+              <span className="loader"></span>
+            </div>
+          ) : (
+            <DataTable
+              searchKey="Item Name"
+              pageNo={page}
+              columns={inventoryColumns}
+              data={inventories}
+              pageCount={pageCount}
+              statusBox={false}
+              onDelete={handleDeleteSelectedRows}
+            />
+          )}
         </div>
-      ) : (
-        <DataTable
-          searchKey="Item Name"
-          pageNo={page}
-          columns={inventoryColumns}
-          //  totalInventory={totalInventory}
-          data={inventory}
-          pageCount={pageCount}
-          statusBox={false}
-          onDelete={handleDeleteSelectedRows}
-        />
-      )}
+      </PageContainer>
     </>
   );
 };

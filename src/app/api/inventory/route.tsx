@@ -62,18 +62,14 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
 
     // Fetch multiple inventory items with pagination and search
     if (limit) {
-      const [inventories, count] = await Promise.all([
-        prisma.inventory.findMany({
-          skip: offset,
-          take: limit,
-          where: { name: { contains: itemName } },
-        }),
-        prisma.inventory.count({ where: { name: { contains: itemName } } }),
-      ]);
+      const inventories = await prisma.inventory.findMany({
+        skip: offset,
+        take: limit,
+        where: { name: { contains: itemName } },
+      });
 
       return NextResponse.json({
         inventories,
-        count,
         message: "Success",
         status: 200,
       });

@@ -7,8 +7,11 @@ import {
   LogIn,
   User,
   User2Icon,
-  UtensilsIcon,
   ArrowRight,
+  ArrowDown,
+  CookingPot,
+  History,
+  FileText,
 } from "lucide-react";
 
 export type Icon = LucideIcon;
@@ -20,9 +23,11 @@ export const Icons = {
   kanban: CircuitBoardIcon,
   employee: UserX2Icon,
   user: User,
-  inventory: UtensilsIcon,
+  inventory: FileText,
   arrowRight: ArrowRight,
-
+  arrowDown: ArrowDown,
+  cookingPot: CookingPot,
+  history: History,
 
   gitHub: ({ ...props }: LucideProps) => (
     <svg

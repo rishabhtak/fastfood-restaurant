@@ -1,12 +1,6 @@
-import Breadcrumbs from "@/components/Breadcrumbs";
 import PageContainer from "@/components/Admin/PageContainer";
-import { buttonVariants } from "@/components/ui/button";
 import { Heading } from "@/components/ui/heading";
-import { Separator } from "@/components/ui/separator";
 import { inventoryType } from "@/types/inventoryType";
-import { cn } from "@/lib/utils";
-import { Plus } from "lucide-react";
-import Link from "next/link";
 import { Inventory } from "@/components/Admin/Inventory/Inventory";
 
 const breadcrumbItems = [
@@ -41,41 +35,16 @@ export default async function page({ searchParams }: paramsProps) {
     if (data.status === "400" || data.status === "500") {
       throw new Error("Failed to fetch inventory data");
     }
-    const totalInventory = data.count;
-    const pageCount = Math.ceil(totalInventory / pageLimit);
+    const pageCount = Math.ceil(data?.inventories?.length / pageLimit);
     const inventory: inventoryType[] = data.inventories;
 
     return (
-      <PageContainer>
-        <div className="space-y-4">
-          <Breadcrumbs items={breadcrumbItems} />
-          <div className="flex items-start justify-between">
-            <Heading title={`Inventory (${totalInventory})`} />
-            <div className="flex justify-end gap-3">
-              <Link
-                href={"/admin/dashboard/inventory/category"}
-                className={cn(buttonVariants({ variant: "default" }))}
-              >
-                <Plus className="mr-2 h-4 w-4" /> Add Category
-              </Link>
-              <Link
-                href={"/admin/dashboard/inventory/new"}
-                className={cn(buttonVariants({ variant: "default" }))}
-              >
-                <Plus className="mr-2 h-4 w-4" /> Add Item
-              </Link>
-              <Link
-                href={"/admin/dashboard/inventory/updateinstock"}
-                className={cn(buttonVariants({ variant: "default" }))}
-              >
-                <Plus className="mr-2 h-4 w-4" /> Update InStock
-              </Link>
-            </div>
-          </div>
-          <Separator />
-          <Inventory inventory={inventory} pageCount={pageCount} page={page} />
-        </div>
-      </PageContainer>
+      <Inventory
+        inventory={inventory}
+        pageCount={pageCount}
+        page={page}
+        breadcrumbItems={breadcrumbItems}
+      />
     );
   } catch (error) {
     return (
