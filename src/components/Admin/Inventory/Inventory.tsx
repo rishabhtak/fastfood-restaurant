@@ -94,6 +94,8 @@ export const Inventory = ({
     setInventories(inventory);
   }, [inventory, setInventories]);
 
+  console.log(inventories);
+
   return (
     <>
       <PageContainer>

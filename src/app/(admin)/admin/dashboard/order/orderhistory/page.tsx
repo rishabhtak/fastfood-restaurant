@@ -1,9 +1,6 @@
-import React from 'react'
-
+import OrderHistory from "@/components/Admin/Order/OrderHistory";
 const page = () => {
-  return (
-    <div>Order History Page</div>
-  )
-}
+  return <OrderHistory />;
+};
 
-export default page
+export default page;

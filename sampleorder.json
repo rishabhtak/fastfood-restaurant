@@ -1,0 +1,115 @@
+[
+  {
+    "id": "658592df12803bc738d64b67",
+    "paymentStatus": "paid",
+    "final_price": 120,
+    "final_quantity": 1,
+    "orderStatus": "preparing",
+    "order_placed":0,
+    "items": [
+      {
+        "id": 1,
+        "name": "burger",
+        "description": "burger with cheese slice",
+        "image": "",
+        "category": "veg",
+        "vegNonVeg": "veg",
+        "total_price": 120,
+        "variety": [
+          {
+            "id": 1,
+            "name": "white bun",
+            "price": 100
+          }
+        ],
+        "addons": [
+          {
+            "id": 1,
+            "name": "green chutney",
+            "price": 20
+          }
+        ],
+        "inStock": true,
+        "quantity": 1
+      }
+    ],
+    "selectAddress": {
+      "customerId": "65465d84c977833bb5b13cc7",
+      "email": "testing@gmail.com",
+      "fullname": "rishabh",
+      "phone": "9887194518",
+      "address": "275-a, vinoba vihar, model town, malviya nagar, jaipur",
+      "city": "jaipur",
+      "state": "rajasthan",
+      "pincode": "302017",
+      "country": "india"
+    },
+    "createdAt": "2024-11-26T05:29:22.420Z"
+  },
+  {
+    "id": "658592df12803bc738d25896",
+    "paymentStatus": "paid",
+    "final_price": 590,
+    "final_quantity": 3,
+    "orderStatus": "preparing",
+    "order_placed":1,
+    "items": [
+      {
+        "id": 1,
+        "name": "pizza",
+        "description": "pizza with mushroom,onion and tomato",
+        "image": "",
+        "category": "veg",
+        "vegNonVeg": "veg",
+        "total_price": 340,
+        "variety": [
+          {
+            "id": 1,
+            "name": "small",
+            "price": 150
+          }
+        ],
+        "addons": [
+          {
+            "id": 1,
+            "name": "capsicum",
+            "price": 20
+          }
+        ],
+        "inStock": true,
+        "quantity": 2
+      },
+      {
+        "id": 2,
+        "name": "pizza",
+        "description": "pizza with mushroom,onion and tomato",
+        "image": "",
+        "category": "veg",
+        "vegNonVeg": "veg",
+        "total_price": 250,
+        "variety": [
+          {
+            "id": 1,
+            "name": "medium",
+            "price": 250
+          }
+        ],
+        "addons": [],
+        "inStock": true,
+        "quantity": 1
+      }
+    ],
+    "selectAddress": {
+      "customerId": "65465d84c977833b25689c7",
+      "email": "test@gmail.com",
+      "fullname": "anjali",
+      "phone": "9876543210",
+      "address": "280, ganesh vihar, model town, malviya nagar, jaipur",
+      "city": "jaipur",
+      "state": "rajasthan",
+      "pincode": "302017",
+      "country": "india"
+    },
+    "createdAt": "2024-11-26T06:29:22.420Z"
+  }
+]

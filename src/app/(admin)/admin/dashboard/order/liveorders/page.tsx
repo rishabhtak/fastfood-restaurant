@@ -1,9 +1,12 @@
-import React from 'react'
+import React from "react";
+import LiveOrder from "@/components/Admin/Order/LiveOrder";
 
 const page = () => {
   return (
-    <div>Live Order Page</div>
-  )
-}
+    <>
+      <LiveOrder />
+    </>
+  );
+};
 
-export default page
+export default page;
